@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+
+class othello_board{
+    private:
+        std::vector<std::vector<int>> board; //オセロ盤 白:1 黒:-1 空:0
+        int disks, disks_white, disks_black; //石の数
+
+        
+
+
+    public:
+        othello_board();
+        void show();
+        void set_board_default(); //オセロ盤セット
+        void set_board(std::vector<std::vector<int>>); //オセロ盤セット（任意）
+        std::vector<std::vector<int>> get_board(); //盤面取得
+        std::vector<std::vector<int>> get_place_able(int disk); //オセロ設置可能場所取得
+        bool judge_place_able(int cow, int row, int disk); //オセロ設置可能判定
+        void place_disk(int cow, int row, int disk); //オセロ設置
+        int get_disks(); //オセロの数取得
+        int get_disks_white(); //白の数取得
+        int get_disks_black(); //黒の数取得
+
+
+};
+
+othello_board::othello_board(){
+    board = std::vector<std::vector<int>>(8, std::vector<int>(8, 0));
+    disks = 0;
+    disks_white = 0;
+    disks_black = 0;
+}
+
+void othello_board::show(){
+    for (const auto& e1 : board)
+    {
+        for (const auto& e2 : e1)
+        {
+            std::cout << e2 << " ";
+        }
+        std::cout << std::endl;
+    }
+}
