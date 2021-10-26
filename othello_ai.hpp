@@ -44,7 +44,7 @@ std::vector<std::vector<int>> othello_ai::convert_matrix_to_vector(Eigen::Matrix
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(int disk){
-    std::pair<int, int> r;
+    std::vector<std::pair<int, int>> r;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -53,7 +53,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(int disk){
         }
         
     }
-    
+
 
 
 
