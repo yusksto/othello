@@ -13,12 +13,12 @@ class othello_board{
         othello_board();
         void show(); //盤面表示コンソールデバッグ用
         void set_board_default(); //オセロ盤セット
-        void set_board(std::vector<std::vector<int>> board); //オセロ盤セット（任意）
+        void set_board(std::vector<std::vector<int>> board_); //オセロ盤セット（任意）
         std::vector<std::vector<int>> get_board(); //盤面取得
-        std::vector<std::vector<int>> get_place_able(int disk); //オセロ設置可能場所取得
-        bool judge_place_able(int cow, int row, int disk); //オセロ設置可能判定（その場所が設置できるか）
-        bool judge_place_able(int disk); //オセロ設置可能判定（設置できる場所があるか）
-        void place_disk(int cow, int row, int disk); //オセロ設置
+        std::vector<std::vector<int>> get_place_able(int disk_); //オセロ設置可能場所取得
+        bool judge_place_able(int cow_, int row_, int disk_); //オセロ設置可能判定（その場所が設置できるか）
+        bool judge_place_able(int disk_); //オセロ設置可能判定（設置できる場所があるか）
+        void place_disk(int cow_, int row_, int disk_); //オセロ設置
         int get_disks(); //オセロの数取得
         int get_disks_white(); //白の数取得
         int get_disks_black(); //黒の数取得
