@@ -12,12 +12,14 @@ class othello_ai
         std::vector<std::vector<int>> parameter; //盤面評価パラメータ
         int mode; //aiモード
 
+
+
         std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
         std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
 
 
 
-    
+
 };
 
 othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_)
@@ -52,14 +54,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //右
             if (i < 6 && board_[i + 1][j] == -disk_)
             {
-                for (int k = 1; i + k < 8; k++)
+                for (int k = 2; i + k < 8; k++)
                 {
-                    if (board_[i + k + 1][j] == disk_)
+                    if (board_[i + k][j] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k + 1][j] == 0)
+                    else if(board_[i + k][j] == 0)
                     {
                         break;
                     }
@@ -73,14 +75,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左
             if (i > 1 && board_[i - 1][j] == -disk_)
             {
-                for (int k = 1; i - k > 0; k++)
+                for (int k = 2; i - k > 0; k++)
                 {
-                    if (board_[i - k - 1][j] == disk_)
+                    if (board_[i - k][j] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k - 1][j] == 0)
+                    else if(board_[i - k][j] == 0)
                     {
                         break;
                     }
@@ -94,14 +96,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //下
             if (j < 6 && board_[i][j + 1] == -disk_)
             {
-                for (int k = 1; j + k < 8; k++)
+                for (int k = 2; j + k < 8; k++)
                 {
-                    if (board_[i][j + k + 1] == disk_)
+                    if (board_[i][j + k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j + k + 1] == 0)
+                    else if(board_[i][j + k] == 0)
                     {
                         break;
                     }
@@ -115,14 +117,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //上
             if (j > 1 && board_[i][j - 1] == -disk_)
             {
-                for (int k = 1; j - k > 0; k++)
+                for (int k = 2; j - k > 0; k++)
                 {
-                    if (board_[i][j - k - 1] == disk_)
+                    if (board_[i][j - k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j - k - 1] == 0)
+                    else if(board_[i][j - k] == 0)
                     {
                         break;
                     }
@@ -136,14 +138,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //右下
             if (i < 6 && j < 6 && board_[i + 1][j + 1] == -disk_)
             {
-                for (int k = 1; i + k < 8 || j + k < 8; k++)
+                for (int k = 2; i + k < 8 || j + k < 8; k++)
                 {
-                    if (board_[i + k + 1][j + k + 1] == disk_)
+                    if (board_[i + k][j + k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k + 1][j + k + 1] == 0)
+                    else if(board_[i + k][j + k] == 0)
                     {
                         break;
                     }
@@ -157,14 +159,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左上
             if (i > 1 && j > 1 && board_[i - 1][j - 1] == -disk_)
             {
-                for (int k = 1; i - k > 0 || j - k > 0; k++)
+                for (int k = 2; i - k > 0 || j - k > 0; k++)
                 {
-                    if (board_[i - k - 1][j - k - 1] == disk_)
+                    if (board_[i - k][j - k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k - 1][i - k - 1] == 0)
+                    else if(board_[i - k][i - k] == 0)
                     {
                         break;
                     }
@@ -178,14 +180,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左下
             if (i > 0 && j < 6 && board_[i - 1][j + 1] == -disk_)
             {
-                for (int k = 1; i - k > 0 || j + k < 8; k++)
+                for (int k = 2; i - k > 0 || j + k < 8; k++)
                 {
-                    if (board_[i - k - 1][j + k + 1] == disk_)
+                    if (board_[i - k][j + k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k - 1][j + k + 1] == 0)
+                    else if(board_[i - k][j + k] == 0)
                     {
                         break;
                     }
@@ -199,14 +201,14 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //右上
             if (i < 6 && j > 0 && board_[i + 1][j - 1] == -disk_)
             {
-                for (int k = 1; i + k < 8 || j - k > 0; k++)
+                for (int k = 2; i + k < 8 || j - k > 0; k++)
                 {
-                    if (board_[i + k + 1][j - k - 1] == disk_)
+                    if (board_[i + k][j - k] == disk_)
                     {
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k + 1][j - k - 1] == 0)
+                    else if(board_[i + k][j - k] == 0)
                     {
                         break;
                     }
@@ -224,151 +226,158 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
 
 std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_)
 {
+    board_[place_.first][place_.second] = disk_;
     //右
     if (board_[place_.first + 1][place_.second] == -disk_)
     {
-        for (int i = 1; place_.first + i < 8; i++)
+        for (int i = 2; place_.first + i < 8; i++)
         {
-            if (board_[place_.first + i + 1][place_.second] == disk_)
+            if (board_[place_.first + i][place_.second] == disk_)
             {
                 for (int j = 1; j < i; j++)
                 {
-                    board_[place_.first + j + 1][place_.second] *= -1;
+                    board_[place_.first + j][place_.second] *= -1;
                 }
-                
+                break;
             }
-            else if(board_[place_.first + i + 1][place_.second] == 0)
+            else if(board_[place_.first + i][place_.second] == 0)
             {
                 break;
             }
         }
     }
     //左
-    if (i > 1 && board_[i - 1][j] == -disk_)
+    if (board_[place_.first - 1][place_.second] == -disk_)
     {
-        for (int k = 1; i - k > 0; k++)
+        for (int i = 2; place_.first - i > 0; i++)
         {
-            if (board_[i - k - 1][j] == disk_)
+            if (board_[place_.first - i][place_.second] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first - j][place_.second] *= -1;
+                }
                 break;
             }
-            else if(board_[i - k - 1][j] == 0)
+            else if(board_[place_.first - i][place_.second] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
     //下
-    if (j < 6 && board_[i][j + 1] == -disk_)
+    if (board_[place_.first][place_.second + 1] == -disk_)
     {
-        for (int k = 1; j + k < 8; k++)
+        for (int i = 2; place_.first + i < 8; i++)
         {
-            if (board_[i][j + k + 1] == disk_)
+            if (board_[place_.first][place_.second + i] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first][place_.second + j] *= -1;
+                }
                 break;
             }
-            else if(board_[i][j + k + 1] == 0)
+            else if(board_[place_.first][place_.second + i] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
     //上
-    if (j > 1 && board_[i][j - 1] == -disk_)
+    if (board_[place_.first][place_.second - 1] == -disk_)
     {
-        for (int k = 1; j - k > 0; k++)
+        for (int i = 2; place_.first - i > 0; i++)
         {
-            if (board_[i][j - k - 1] == disk_)
+            if (board_[place_.first][place_.second - i] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first][place_.second - j] *= -1;
+                }
                 break;
             }
-            else if(board_[i][j - k - 1] == 0)
+            else if(board_[place_.first][place_.second - i] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
     //右下
-    if (i < 6 && j < 6 && board_[i + 1][j + 1] == -disk_)
+    if (board_[place_.first + 1][place_.second + 1] == -disk_)
     {
-        for (int k = 1; i + k < 8 || j + k < 8; k++)
+        for (int i = 2; place_.first + i < 8 || place_.second + i < 8; i++)
         {
-            if (board_[i + k + 1][j + k + 1] == disk_)
+            if (board_[place_.first + i][place_.second + i] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first + j][place_.second + j] *= -1;
+                }
                 break;
             }
-            else if(board_[i + k + 1][j + k + 1] == 0)
+            else if(board_[place_.first + i][place_.second + i] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
     //左上
-    if (i > 1 && j > 1 && board_[i - 1][j - 1] == -disk_)
+    if (board_[place_.first - 1][place_.second - 1] == -disk_)
     {
-        for (int k = 1; i - k > 0 || j - k > 0; k++)
+        for (int i = 2; place_.first - i > 0 || place_.second - i > 0; i++)
         {
-            if (board_[i - k - 1][j - k - 1] == disk_)
+            if (board_[place_.first - i][place_.second - i] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first - j][place_.second - j] *= -1;
+                }
                 break;
             }
-            else if(board_[i - k - 1][i - k - 1] == 0)
+            else if(board_[place_.first - i][place_.second - i] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
     //左下
-    if (i > 0 && j < 6 && board_[i - 1][j + 1] == -disk_)
+    if (board_[place_.first - 1][place_.second + 1] == -disk_)
     {
-        for (int k = 1; i - k > 0 || j + k < 8; k++)
+        for (int i = 2; place_.first - i > 0 || place_.second + i < 8; i++)
         {
-            if (board_[i - k - 1][j + k + 1] == disk_)
+            if (board_[place_.first - i][place_.second + i] == disk_)
             {
-                can_place = true;
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first - j][place_.second + j] *= -1;
+                }
                 break;
             }
-            else if(board_[i - k - 1][j + k + 1] == 0)
+            else if(board_[place_.first - i][place_.second + i] == 0)
             {
                 break;
             }
-        }
-        if (can_place == true)
-        {
-            r.push_back(std::make_pair(i, j));
-            continue;
         }
     }
-    //右上
-    if (i < 6 && j > 0 && board_[i + 1][j - 1] == -disk_)
+    //左上
+    if (board_[place_.first + 1][place_.second - 1] == -disk_)
+    {
+        for (int i = 2; place_.first + i < 8 || place_.second - i > 0; i++)
+        {
+            if (board_[place_.first + i][place_.second - i] == disk_)
+            {
+                for (int j = 1; j < i; j++)
+                {
+                    board_[place_.first + j][place_.second - j] *= -1;
+                }
+                break;
+            }
+            else if(board_[place_.first + i][place_.second - i] == 0)
+            {
+                break;
+            }
+        }
+    }
+    return board_;
 }
