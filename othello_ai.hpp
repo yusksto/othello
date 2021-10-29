@@ -1,5 +1,6 @@
-#include "Eigen/Eigen"
+#include <iostream>
 #include <vector>
+#include "Eigen/Eigen"
 
 class othello_ai{
     public:
