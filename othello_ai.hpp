@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "Eigen/Eigen"
 
 class othello_ai
@@ -12,12 +13,13 @@ class othello_ai
         std::vector<std::vector<int>> parameter; //盤面評価パラメータ
         int mode; //aiモード
 
+    
 
 
         std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
         std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
-
-
+        double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, double alpha_, double beta_);
+        double evaluation(std::vector<std::vector<int>> board_, int disk_);
 
 
 };
@@ -30,14 +32,6 @@ othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_)
 
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_, int disk_)
 {
-
-
-
-
-
-
-
-
 
 
 
@@ -381,3 +375,23 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     }
     return board_;
 }
+
+double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, double alpha_, double beta_)
+{
+    std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
+    if (!r.empty() || depth_ == 0)
+    {
+        return evaluation(board_, disk_);
+    }
+    for (const auto& e : r)
+    {
+        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, -beta_, -alpha_));
+        if(alpha_ >= beta_)
+        {
+            return alpha_;
+        }
+    }
+    return alpha_;
+}
+
+
