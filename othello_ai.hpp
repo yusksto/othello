@@ -13,9 +13,6 @@ class othello_ai
         std::vector<std::vector<int>> parameter; //盤面評価パラメータ
         int mode; //aiモード
 
-    
-
-
         std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
         std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
         double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, double alpha_, double beta_);
@@ -393,5 +390,3 @@ double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, in
     }
     return alpha_;
 }
-
-
