@@ -31,7 +31,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
 {
 
 
-
+    return std::make_pair(0, 0);
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vector<int>> board_, int disk_)
@@ -389,4 +389,9 @@ double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, in
         }
     }
     return alpha_;
+}
+
+double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
+{
+    return 0.;
 }
