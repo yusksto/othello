@@ -26,14 +26,16 @@ class othello_board{
 
 };
 
-othello_board::othello_board(){
+othello_board::othello_board()
+{
     board = std::vector<std::vector<int>>(8, std::vector<int>(8, 0));
     disks = 0;
     disks_white = 0;
     disks_black = 0;
 }
 
-void othello_board::show(){
+void othello_board::show()
+{
     for (const auto& e1 : board)
     {
         for (const auto& e2 : e1)
