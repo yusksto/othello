@@ -1,36 +1,57 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <limits>
+#include <time.h>
 
 class othello_ai
 {
     public:
-        othello_ai(std::vector<std::vector<int>> parameter_, int mode_); //othello_aiセット
+        othello_ai(std::vector<std::vector<int>> parameter_, int mode_, int depth_min_, double time_max_); //othello_aiセット
         std::pair<int, int> get_place_ai(std::vector<std::vector<int>> board_, int disk_); //ai設置場所取得
 
     private:
         std::vector<std::vector<int>> parameter; //盤面評価パラメータ
-        int mode; //aiモード
+        int mode; //aiモード 1:最強 -1:最弱
+        int depth_min; //探索最低深度
+        double time_max; //探索最大時間[ms]
+        const double inf = std::numeric_limits<double>::infinity();
 
         std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
         std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
-        double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, double alpha_, double beta_);
+        double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_);
         double evaluation(std::vector<std::vector<int>> board_, int disk_);
 
 
 };
 
-othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_)
+othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_, int depth_min_, double time_max_)
 {
     parameter = parameter_;
     mode = mode_;
+    depth_min = depth_min_;
+    time_max = time_max_;
 }
 
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_, int disk_)
 {
-
-
-    return std::make_pair(0, 0);
+    std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
+    std::vector<double> val(r.size());
+    for (int i = 0; i < r.size(); i++)
+    {
+        val[i] = alphabeta(get_board_placed(board_, r[i], disk_), disk_ * -1, depth_min, std::clock(), -inf, inf);
+    }
+    double val_max = -inf;
+    int j;
+    for (int i = 0; i < r.size(); i++)
+    {
+        if (val_max < val[i])
+        {
+            val_max = val[i];
+            j = i;
+        }
+    }
+    return r[j];
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vector<int>> board_, int disk_)
@@ -372,16 +393,16 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     return board_;
 }
 
-double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, double alpha_, double beta_)
+double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
-    if (!r.empty() || depth_ == 0)
+    if (!r.empty() || (depth_ == 0 && std::clock() - time_start_ > time_max))
     {
         return evaluation(board_, disk_);
     }
     for (const auto& e : r)
     {
-        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, -beta_, -alpha_));
+        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, time_start_,  -beta_, -alpha_));
         if(alpha_ >= beta_)
         {
             return alpha_;
