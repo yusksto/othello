@@ -16,11 +16,14 @@ class othello_ai
         int depth_min; //探索最低深度
         double time_max; //探索最大時間[ms]
         const double inf = std::numeric_limits<double>::infinity();
+        const double k = 0.1;
 
         std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
         std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
         double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_);
         double evaluation(std::vector<std::vector<int>> board_, int disk_);
+        int get_disks_all();
+        int get_disks(int disk);
 
 
 };
@@ -35,23 +38,22 @@ othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_, int 
 
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_, int disk_)
 {
+
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
     std::vector<double> val(r.size());
     for (int i = 0; i < r.size(); i++)
     {
         val[i] = alphabeta(get_board_placed(board_, r[i], disk_), disk_ * -1, depth_min, std::clock(), -inf, inf);
     }
-    double val_max = -inf;
-    int j;
+    std::vector<std::pair<double, std::pair<int, int>>> s;
     for (int i = 0; i < r.size(); i++)
     {
-        if (val_max < val[i])
-        {
-            val_max = val[i];
-            j = i;
-        }
+        s[i] = std::make_pair(val[i], r[i]);
     }
-    return r[j];
+    
+
+    sort(s.begin(), s.end(), std::greater<std::pair<int, int>>());
+    return s[0].second;
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vector<int>> board_, int disk_)
@@ -413,5 +415,14 @@ double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, in
 
 double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
 {
-    return 0.;
+    double s = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            s += board_[i][j] * parameter[i][j];
+        }
+    }
+    
+    return s + ;
 }
