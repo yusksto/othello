@@ -6,9 +6,6 @@ class othello_board{
         std::vector<std::vector<int>> board; //オセロ盤 白:1 黒:-1 空:0
         int disks, disks_white, disks_black; //石の数
 
-        
-
-
     public:
         othello_board();
         void show(); //盤面表示コンソールデバッグ用
@@ -23,8 +20,6 @@ class othello_board{
         int get_disks(int disk_); //オセロの数取得
         int get_disks_white(); //白の数取得
         int get_disks_black(); //黒の数取得
-
-
 };
 
 othello_board::othello_board()
