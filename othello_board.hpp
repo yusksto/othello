@@ -19,7 +19,8 @@ class othello_board{
         bool judge_place_able(std::pair<int, int> place_, int disk_); //オセロ設置可能判定（その場所が設置できるか）
         bool judge_place_able(int disk_); //オセロ設置可能判定（設置できる場所があるか）
         void place_disk(int cow_, int row_, int disk_); //オセロ設置
-        int get_disks(); //オセロの数取得
+        int get_disks_all(); //オセロの数取得
+        int get_disks(int disk_); //オセロの数取得
         int get_disks_white(); //白の数取得
         int get_disks_black(); //黒の数取得
 
