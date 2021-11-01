@@ -55,7 +55,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     {
         s[i] = std::make_pair(val[i], r[i]);
     }
-    sort(s.begin(), s.end(), std::greater<std::pair<int, int>>());
+    sort(s.begin(), s.end(), std::greater<std::pair<double, std::pair<int, int>>>());
     return s[0].second;
 }
 
@@ -244,7 +244,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
 {
     board_[place_.first][place_.second] = disk_;
     //右
-    if (board_[place_.first + 1][place_.second] == -disk_)
+    if (place_.first < 6 && board_[place_.first + 1][place_.second] == -disk_)
     {
         for (int i = 2; place_.first + i < 8; i++)
         {
@@ -263,7 +263,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //左
-    if (board_[place_.first - 1][place_.second] == -disk_)
+    if (place_.first > 1 && board_[place_.first - 1][place_.second] == -disk_)
     {
         for (int i = 2; place_.first - i > 0; i++)
         {
@@ -282,7 +282,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //下
-    if (board_[place_.first][place_.second + 1] == -disk_)
+    if (place_.second < 6 && board_[place_.first][place_.second + 1] == -disk_)
     {
         for (int i = 2; place_.first + i < 8; i++)
         {
@@ -301,7 +301,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //上
-    if (board_[place_.first][place_.second - 1] == -disk_)
+    if (place_.second > 1 && board_[place_.first][place_.second - 1] == -disk_)
     {
         for (int i = 2; place_.first - i > 0; i++)
         {
@@ -320,7 +320,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //右下
-    if (board_[place_.first + 1][place_.second + 1] == -disk_)
+    if (place_.first < 6 && place_.second < 6 && board_[place_.first + 1][place_.second + 1] == -disk_)
     {
         for (int i = 2; place_.first + i < 8 || place_.second + i < 8; i++)
         {
@@ -339,7 +339,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //左上
-    if (board_[place_.first - 1][place_.second - 1] == -disk_)
+    if (place_.first > 1 && place_.second > 1 && board_[place_.first - 1][place_.second - 1] == -disk_)
     {
         for (int i = 2; place_.first - i > 0 || place_.second - i > 0; i++)
         {
@@ -358,7 +358,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //左下
-    if (board_[place_.first - 1][place_.second + 1] == -disk_)
+    if (place_.first > 1 && place_.second < 6 && board_[place_.first - 1][place_.second + 1] == -disk_)
     {
         for (int i = 2; place_.first - i > 0 || place_.second + i < 8; i++)
         {
@@ -377,7 +377,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
         }
     }
     //左上
-    if (board_[place_.first + 1][place_.second - 1] == -disk_)
+    if (place_.first < 6 && place_.second > 1 && board_[place_.first + 1][place_.second - 1] == -disk_)
     {
         for (int i = 2; place_.first + i < 8 || place_.second - i > 0; i++)
         {
@@ -426,7 +426,7 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     {
         for (int j = 0; j < 8; j++)
         {
-            s_1 += board_[i][j] * parameter[i][j] / 64;
+            s_1 += disk_ * board_[i][j] * parameter[i][j] / 64;
         }
     }
     s_1 *= f_1(n);
