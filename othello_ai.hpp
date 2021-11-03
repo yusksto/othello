@@ -50,6 +50,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     {
         val[i] = mode * -alphabeta(get_board_placed(board_, r[i], disk_), disk_ * -1, depth_min, std::clock(), -inf, inf);
     }
+    /*
     std::vector<std::pair<double, std::pair<int, int>>> s;
     for (int i = 0; i < r.size(); i++)
     {
@@ -57,6 +58,18 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     }
     sort(s.begin(), s.end(), std::greater<std::pair<double, std::pair<int, int>>>());
     return s[0].second;
+    */
+    double val_max = -inf;
+    int i_max = 0;
+    for (int i = 0; i < r.size(); i++)
+    {
+        if (val_max < val[i])
+        {
+            val_max = val[i];
+            i_max = i;
+        }
+    }
+    return r[i_max];
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vector<int>> board_, int disk_)
