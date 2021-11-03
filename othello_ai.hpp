@@ -8,12 +8,12 @@
 class othello_ai
 {
     public:
-        othello_ai(std::vector<std::vector<int>> parameter_, int mode_, int depth_min_, double time_max_); //othello_aiセット
+        othello_ai(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, double time_max_); //othello_aiセット
         std::pair<int, int> get_place_ai(std::vector<std::vector<int>> board_, int disk_); //ai設置場所取得
 
     private:
         //変数
-        std::vector<std::vector<int>> parameter; //盤面評価パラメータ [-1:1]
+        std::vector<std::vector<double>> parameter; //盤面評価パラメータ [-1:1]
         int mode; //aiモード 1:最強 -1:最弱
         int depth_min; //探索最低深度 [0:)
         double time_max; //探索最大時間 [ms]
@@ -34,7 +34,7 @@ class othello_ai
         double f_3(double x); //f_3[0:1], x[0:1]
 };
 
-othello_ai::othello_ai(std::vector<std::vector<int>> parameter_, int mode_, int depth_min_, double time_max_)
+othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, double time_max_)
 {
     parameter = parameter_;
     mode = mode_;
