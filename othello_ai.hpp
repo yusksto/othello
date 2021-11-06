@@ -454,7 +454,7 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     double s_2 = 0;
     if (disks_0 != 0 || disks_1 != 0)
     {
-        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * f_2(n);
+        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * f_3(n);
     }
 
     //設置可能場所数 s_3[-1:1]
@@ -463,7 +463,7 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     double s_3 = 0;
     if (disks_able_0 != 0 || disks_able_1 != 0)
     {
-        s_3 = (disks_able_0 - disks_able_1) / (disks_able_0 + disks_able_1) * f_3(n);
+        s_3 = (disks_able_0 - disks_able_1) / (disks_able_0 + disks_able_1) * f_1(n);
     }
     
     return s_1 + s_2 + s_3;
