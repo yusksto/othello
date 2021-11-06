@@ -4,34 +4,35 @@
 #include <algorithm>
 #include <limits>
 #include <time.h>
+#include <omp.h>
 
 class othello_ai
 {
-    public:
-        othello_ai(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, int time_max_); //othello_aiセット
-        std::pair<int, int> get_place_ai(std::vector<std::vector<int>> board_, int disk_); //ai設置場所取得
+public:
+    othello_ai(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, int time_max_); //othello_aiセット
+    std::pair<int, int> get_place_ai(std::vector<std::vector<int>> board_, int disk_); //ai設置場所取得
 
-    private:
-        //変数
-        std::vector<std::vector<double>> parameter; //盤面評価パラメータ [-1:1]
-        int mode; //aiモード 1:最強 -1:最弱
-        int depth_min; //探索最低深度 [0:)
-        int time_max; //探索最大時間 [ms]
+//private:
+    //変数
+    std::vector<std::vector<double>> parameter; //盤面評価パラメータ [-1:1]
+    int mode; //aiモード 1:最強 -1:最弱
+    int depth_min; //探索最低深度 [0:)
+    int time_max; //探索最大時間 [ms]
 
-        //関数
-        std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
-        std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
-        double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
-        double evaluation(std::vector<std::vector<int>> board_, int disk_); //評価関数
-        int get_disks_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所数取得
-        int get_disks_all(std::vector<std::vector<int>> board_); //石の数取得
-        int get_disks(std::vector<std::vector<int>> board_, int disk_); //石の数取得
+    //関数
+    std::vector<std::pair<int, int>> get_place_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所取得
+    std::vector<std::vector<int>> get_board_placed(std::vector<std::vector<int>> board_, std::pair<int, int> place_, int disk_); //設置後盤面取得
+    double alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
+    double evaluation(std::vector<std::vector<int>> board_, int disk_); //評価関数
+    int get_disks_able(std::vector<std::vector<int>> board_, int disk_); //設置可能場所数取得
+    int get_disks_all(std::vector<std::vector<int>> board_); //石の数取得
+    int get_disks(std::vector<std::vector<int>> board_, int disk_); //石の数取得
 
-        //その他定数、活性化関数
-        const double inf = std::numeric_limits<double>::infinity();
-        double f_1(double x); //f_1[0:1], x[0:1]
-        double f_2(double x); //f_2[0:1], x[0:1]
-        double f_3(double x); //f_3[0:1], x[0:1]
+    //その他定数、活性化関数
+    const double inf = std::numeric_limits<double>::infinity();
+    double f_1(double x); //f_1[0:1], x[0:1]
+    double f_2(double x); //f_2[0:1], x[0:1]
+    double f_3(double x); //f_3[0:1], x[0:1]
 };
 
 othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, int time_max_)
@@ -46,6 +47,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
     std::vector<double> val(r.size());
+#pragma omp parallel for
     for (int i = 0; i < r.size(); i++)
     {
         val[i] = mode * -alphabeta(get_board_placed(board_, r[i], disk_), disk_ * -1, depth_min, std::clock(), -inf, inf);
@@ -94,7 +96,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j] == 0)
+                    else if (board_[i + k][j] == 0)
                     {
                         break;
                     }
@@ -115,7 +117,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][j] == 0)
+                    else if (board_[i - k][j] == 0)
                     {
                         break;
                     }
@@ -136,7 +138,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j + k] == 0)
+                    else if (board_[i][j + k] == 0)
                     {
                         break;
                     }
@@ -157,7 +159,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j - k] == 0)
+                    else if (board_[i][j - k] == 0)
                     {
                         break;
                     }
@@ -178,7 +180,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j + k] == 0)
+                    else if (board_[i + k][j + k] == 0)
                     {
                         break;
                     }
@@ -199,7 +201,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][i - k] == 0)
+                    else if (board_[i - k][i - k] == 0)
                     {
                         break;
                     }
@@ -220,7 +222,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][j + k] == 0)
+                    else if (board_[i - k][j + k] == 0)
                     {
                         break;
                     }
@@ -241,7 +243,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j - k] == 0)
+                    else if (board_[i + k][j - k] == 0)
                     {
                         break;
                     }
@@ -273,7 +275,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first + i][place_.second] == 0)
+            else if (board_[place_.first + i][place_.second] == 0)
             {
                 break;
             }
@@ -292,7 +294,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first - i][place_.second] == 0)
+            else if (board_[place_.first - i][place_.second] == 0)
             {
                 break;
             }
@@ -311,7 +313,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first][place_.second + i] == 0)
+            else if (board_[place_.first][place_.second + i] == 0)
             {
                 break;
             }
@@ -330,7 +332,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first][place_.second - i] == 0)
+            else if (board_[place_.first][place_.second - i] == 0)
             {
                 break;
             }
@@ -349,7 +351,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first + i][place_.second + i] == 0)
+            else if (board_[place_.first + i][place_.second + i] == 0)
             {
                 break;
             }
@@ -368,7 +370,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first - i][place_.second - i] == 0)
+            else if (board_[place_.first - i][place_.second - i] == 0)
             {
                 break;
             }
@@ -387,7 +389,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first - i][place_.second + i] == 0)
+            else if (board_[place_.first - i][place_.second + i] == 0)
             {
                 break;
             }
@@ -406,7 +408,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
                 }
                 break;
             }
-            else if(board_[place_.first + i][place_.second - i] == 0)
+            else if (board_[place_.first + i][place_.second - i] == 0)
             {
                 break;
             }
@@ -418,14 +420,14 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
 double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
-    if (r.empty() || depth_ == 0 || std::clock() - time_start_ > time_max)
+    if (r.empty() || depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(board_, disk_);
     }
     for (const auto& e : r)
     {
-        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, time_start_,  -beta_, -alpha_));
-        if(alpha_ >= beta_)
+        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, time_start_, -beta_, -alpha_));
+        if (alpha_ >= beta_)
         {
             return alpha_;
         }
@@ -454,7 +456,7 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     double s_2 = 0;
     if (disks_0 != 0 || disks_1 != 0)
     {
-        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * f_3(n);
+        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * f_2(n);
     }
 
     //設置可能場所数 s_3[-1:1]
@@ -463,9 +465,9 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     double s_3 = 0;
     if (disks_able_0 != 0 || disks_able_1 != 0)
     {
-        s_3 = (disks_able_0 - disks_able_1) / (disks_able_0 + disks_able_1) * f_1(n);
+        s_3 = (disks_able_0 - disks_able_1) / (disks_able_0 + disks_able_1) * f_3(n);
     }
-    
+
     return s_1 + s_2 + s_3;
 }
 
@@ -491,7 +493,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j] == 0)
+                    else if (board_[i + k][j] == 0)
                     {
                         break;
                     }
@@ -512,7 +514,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][j] == 0)
+                    else if (board_[i - k][j] == 0)
                     {
                         break;
                     }
@@ -533,7 +535,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j + k] == 0)
+                    else if (board_[i][j + k] == 0)
                     {
                         break;
                     }
@@ -554,7 +556,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i][j - k] == 0)
+                    else if (board_[i][j - k] == 0)
                     {
                         break;
                     }
@@ -575,7 +577,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j + k] == 0)
+                    else if (board_[i + k][j + k] == 0)
                     {
                         break;
                     }
@@ -596,7 +598,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][i - k] == 0)
+                    else if (board_[i - k][i - k] == 0)
                     {
                         break;
                     }
@@ -617,7 +619,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i - k][j + k] == 0)
+                    else if (board_[i - k][j + k] == 0)
                     {
                         break;
                     }
@@ -638,7 +640,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                         can_place = true;
                         break;
                     }
-                    else if(board_[i + k][j - k] == 0)
+                    else if (board_[i + k][j - k] == 0)
                     {
                         break;
                     }
@@ -688,7 +690,7 @@ int othello_ai::get_disks(std::vector<std::vector<int>> board_, int disk_)
 
 double othello_ai::f_1(double x)
 {
-    return 16 * pow(x, 4) - 32 * pow(x, 3) + 16 * pow(x, 2);
+    return 1 - pow(x, 2);
 }
 
 double othello_ai::f_2(double x)
@@ -698,5 +700,5 @@ double othello_ai::f_2(double x)
 
 double othello_ai::f_3(double x)
 {
-    return pow(x, 2) * (-2 * x + 3);
+    return 16 * pow(x, 4) - 32 * pow(x, 3) + 16 * pow(x, 2);
 }
