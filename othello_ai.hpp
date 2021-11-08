@@ -110,7 +110,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左
             if (i > 1 && board_[i - 1][j] == -disk_)
             {
-                for (int k = 2; i - k > 0; k++)
+                for (int k = 2; i - k > -1; k++)
                 {
                     if (board_[i - k][j] == disk_)
                     {
@@ -152,7 +152,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //上
             if (j > 1 && board_[i][j - 1] == -disk_)
             {
-                for (int k = 2; j - k > 0; k++)
+                for (int k = 2; j - k > -1; k++)
                 {
                     if (board_[i][j - k] == disk_)
                     {
@@ -194,7 +194,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左上
             if (i > 1 && j > 1 && board_[i - 1][j - 1] == -disk_)
             {
-                for (int k = 2; i - k > 0 && j - k > 0; k++)
+                for (int k = 2; i - k > -1 && j - k > -1; k++)
                 {
                     if (board_[i - k][j - k] == disk_)
                     {
@@ -215,7 +215,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //左下
             if (i > 1 && j < 6 && board_[i - 1][j + 1] == -disk_)
             {
-                for (int k = 2; i - k > 0 && j + k < 8; k++)
+                for (int k = 2; i - k > -1 && j + k < 8; k++)
                 {
                     if (board_[i - k][j + k] == disk_)
                     {
@@ -236,7 +236,7 @@ std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vec
             //右上
             if (i < 6 && j > 1 && board_[i + 1][j - 1] == -disk_)
             {
-                for (int k = 2; i + k < 8 && j - k > 0; k++)
+                for (int k = 2; i + k < 8 && j - k > -1; k++)
                 {
                     if (board_[i + k][j - k] == disk_)
                     {
@@ -284,7 +284,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     //左
     if (place_.first > 1 && board_[place_.first - 1][place_.second] == -disk_)
     {
-        for (int i = 2; place_.first - i > 0; i++)
+        for (int i = 2; place_.first - i > -1; i++)
         {
             if (board_[place_.first - i][place_.second] == disk_)
             {
@@ -322,7 +322,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     //上
     if (place_.second > 1 && board_[place_.first][place_.second - 1] == -disk_)
     {
-        for (int i = 2; place_.second - i > 0; i++)
+        for (int i = 2; place_.second - i > -1; i++)
         {
             if (board_[place_.first][place_.second - i] == disk_)
             {
@@ -360,7 +360,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     //左上
     if (place_.first > 1 && place_.second > 1 && board_[place_.first - 1][place_.second - 1] == -disk_)
     {
-        for (int i = 2; place_.first - i > 0 && place_.second - i > 0; i++)
+        for (int i = 2; place_.first - i > -1 && place_.second - i > -1; i++)
         {
             if (board_[place_.first - i][place_.second - i] == disk_)
             {
@@ -379,7 +379,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     //左下
     if (place_.first > 1 && place_.second < 6 && board_[place_.first - 1][place_.second + 1] == -disk_)
     {
-        for (int i = 2; place_.first - i > 0 && place_.second + i < 8; i++)
+        for (int i = 2; place_.first - i > -1 && place_.second + i < 8; i++)
         {
             if (board_[place_.first - i][place_.second + i] == disk_)
             {
@@ -398,7 +398,7 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
     //左上
     if (place_.first < 6 && place_.second > 1 && board_[place_.first + 1][place_.second - 1] == -disk_)
     {
-        for (int i = 2; place_.first + i < 8 && place_.second - i > 0; i++)
+        for (int i = 2; place_.first + i < 8 && place_.second - i > -1; i++)
         {
             if (board_[place_.first + i][place_.second - i] == disk_)
             {
@@ -507,7 +507,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
             //左
             if (i > 1 && board_[i - 1][j] == -disk_)
             {
-                for (int k = 2; i - k > 0; k++)
+                for (int k = 2; i - k > -1; k++)
                 {
                     if (board_[i - k][j] == disk_)
                     {
@@ -549,7 +549,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
             //上
             if (j > 1 && board_[i][j - 1] == -disk_)
             {
-                for (int k = 2; j - k > 0; k++)
+                for (int k = 2; j - k > -1; k++)
                 {
                     if (board_[i][j - k] == disk_)
                     {
@@ -591,7 +591,7 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
             //左上
             if (i > 1 && j > 1 && board_[i - 1][j - 1] == -disk_)
             {
-                for (int k = 2; i - k > 0 && j - k > 0; k++)
+                for (int k = 2; i - k > -1 && j - k > -1; k++)
                 {
                     if (board_[i - k][j - k] == disk_)
                     {
@@ -610,9 +610,9 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                 }
             }
             //左下
-            if (i > 0 && j < 6 && board_[i - 1][j + 1] == -disk_)
+            if (i > 1 && j < 6 && board_[i - 1][j + 1] == -disk_)
             {
-                for (int k = 2; i - k > 0 && j + k < 8; k++)
+                for (int k = 2; i - k > -1 && j + k < 8; k++)
                 {
                     if (board_[i - k][j + k] == disk_)
                     {
@@ -631,9 +631,9 @@ int othello_ai::get_disks_able(std::vector<std::vector<int>> board_, int disk_)
                 }
             }
             //右上
-            if (i < 6 && j > 0 && board_[i + 1][j - 1] == -disk_)
+            if (i < 6 && j > 1 && board_[i + 1][j - 1] == -disk_)
             {
-                for (int k = 2; i + k < 8 && j - k > 0; k++)
+                for (int k = 2; i + k < 8 && j - k > -1; k++)
                 {
                     if (board_[i + k][j - k] == disk_)
                     {
