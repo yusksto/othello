@@ -437,7 +437,7 @@ double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, in
 
 double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
 {
-    double n = get_disks_all(board_) / 64; //盤面進行度 [0:1]
+    double n = double(get_disks_all(board_)) / 64.; //盤面進行度 [0:1]
 
     //盤面配置良さ s_1[-1:1]
     double s_1 = 0;
@@ -445,23 +445,23 @@ double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
     {
         for (int j = 0; j < 8; j++)
         {
-            s_1 += disk_ * board_[i][j] * parameter[i][j] / 64;
+            s_1 += double(disk_) * double(board_[i][j]) * parameter[i][j] / 64.;
         }
     }
-    s_1 *= f_1(n);
+    s_1 *= f_1(f_1(pow(f_1(n), 4)));
 
     //石の数 s_2[-1:1]
-    int disks_0 = get_disks(board_, disk_);
-    int disks_1 = get_disks(board_, -disk_);
+    double disks_0 = double(get_disks(board_, disk_));
+    double disks_1 = double(get_disks(board_, -disk_));
     double s_2 = 0;
     if (disks_0 != 0 || disks_1 != 0)
     {
-        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * f_2(n);
+        s_2 = (disks_0 - disks_1) / (disks_0 + disks_1) * (1 - f_1(f_1(pow(f_1(n), 4))));
     }
 
     //設置可能場所数 s_3[-1:1]
-    int disks_able_0 = get_disks_able(board_, disk_);
-    int disks_able_1 = get_disks_able(board_, -disk_);
+    double disks_able_0 = double(get_disks_able(board_, disk_));
+    double disks_able_1 = double(get_disks_able(board_, -disk_));
     double s_3 = 0;
     if (disks_able_0 != 0 || disks_able_1 != 0)
     {
@@ -690,7 +690,7 @@ int othello_ai::get_disks(std::vector<std::vector<int>> board_, int disk_)
 
 double othello_ai::f_1(double x)
 {
-    return 1 - pow(x, 2);
+    return pow(x, 2) * (-2 * x + 3);
 }
 
 double othello_ai::f_2(double x)
