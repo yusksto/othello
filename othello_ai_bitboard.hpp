@@ -21,13 +21,13 @@ class othello_ai
         int time_max; //探索最大時間 [ms]
 
         //関数
-        int64_t get_place_able(int64_t board_0, int64_t board_1); //設置可能場所取得
-        std::pair<int64_t, int64_t> get_board_placed(int64_t board_0, int64_t board_1, int64_t place); //設置後盤面取得
-        double alphabeta(int64_t board_0, int64_t board_1, int depth, clock_t time_start, double alpha, double beta); //αβ探索
-        double evaluation(int64_t board_0, int64_t board_1); //評価関数
-        int get_disks_able(int64_t board_0, int64_t board_1); //設置可能場所数取得
-        int get_disks_all(int64_t board_0, int64_t board_1); //石の数取得
-        int get_disks(int64_t board_0); //石の数取得
+        std::vector<int64_t> get_place_able(std::pair<int64_t, int64_t>); //設置可能場所取得
+        std::pair<int64_t, int64_t> get_board_placed(std::pair<int64_t, int64_t> board, int64_t place); //設置後盤面取得
+        double alphabeta(std::pair<int64_t, int64_t> board, int depth, clock_t time_start, double alpha, double beta); //αβ探索
+        double evaluation(std::pair<int64_t, int64_t> board); //評価関数
+        int get_disks_able(std::pair<int64_t, int64_t> board); //設置可能場所数取得
+        int get_disks_all(std::pair<int64_t, int64_t> board); //石の数取得
+        int get_disks(int64_t board); //石の数取得
 
         //その他定数、活性化関数
         const double inf = std::numeric_limits<double>::infinity();
@@ -75,26 +75,26 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     return r[i_max];
 }
 
-int64_t othello_ai::get_place_able(int64_t board_0, int64_t board_1)
+std::vector<int64_t> othello_ai::get_place_able(std::pair<int64_t, int64_t> board)
 {
     
 }
 
-std::pair<int64_t, int64_t> othello_ai::get_board_placed(int64_t board_0, int64_t board_1, int64_t place)
+std::pair<int64_t, int64_t> othello_ai::get_board_placed(std::pair<int64_t, int64_t>, int64_t place)
 {
     
 }
 
-double othello_ai::alphabeta(int64_t board_0, int64_t board_1, int depth, clock_t time_start, double alpha, double beta)
+double othello_ai::alphabeta(std::pair<int64_t, int64_t> board, int depth, clock_t time_start, double alpha, double beta)
 {
-    std::vector<std::pair<int, int>> r = get_place_able(board_0, board_1);
+    std::vector<int64_t> r = get_place_able(board);
     if (r.empty() || depth <= 0 || std::clock() - time_start > time_max)
     {
-        return evaluation(board_0, board_1);
+        return evaluation(board);
     }
     for (const auto& e : r)
     {
-        alpha = std::max(alpha, -alphabeta(get_board_placed(board, e, disk), disk * -1, depth - 1, time_start, -beta, -alpha));
+        alpha = std::max(alpha, -alphabeta(get_board_placed(board, e), depth - 1, time_start, -beta, -alpha));
         if (alpha >= beta)
         {
             return alpha;
@@ -103,7 +103,7 @@ double othello_ai::alphabeta(int64_t board_0, int64_t board_1, int depth, clock_
     return alpha;
 }
 
-double othello_ai::evaluation(int64_t board_0, int64_t board_1)
+double othello_ai::evaluation(std::pair<int64_t, int64_t> board)
 {
     double n = double(get_disks_all(board)) / 64.; //盤面進行度 [0:1]
 
@@ -113,14 +113,14 @@ double othello_ai::evaluation(int64_t board_0, int64_t board_1)
     {
         for (int j = 0; j < 8; j++)
         {
-            s_1 += double(disk) * double(board[i][j]) * parameter[i][j] / 64.;
+            //s_1 += double(disk) * double(board[i][j]) * parameter[i][j] / 64.;
         }
     }
     s_1 *= f_1(f_1(pow(f_1(n), 4)));
 
     //石の数 s_2[-1:1]
-    int disks_0 = get_disks(board, disk);
-    int disks_1 = get_disks(board, -disk);
+    int disks_0 = get_disks(board.first);
+    int disks_1 = get_disks(board.second);
     double s_2 = 0;
     if (disks_0 != 0 || disks_1 != 0)
     {
@@ -128,8 +128,8 @@ double othello_ai::evaluation(int64_t board_0, int64_t board_1)
     }
 
     //設置可能場所数 s_3[-1:1]
-    int disks_able_0 = get_disks_able(board_, disk_);
-    int disks_able_1 = get_disks_able(board_, -disk_);
+    int disks_able_0 = get_disks_able(board);
+    int disks_able_1 = get_disks_able(board);
     double s_3 = 0;
     if (disks_able_0 != 0 || disks_able_1 != 0)
     {
@@ -139,41 +139,19 @@ double othello_ai::evaluation(int64_t board_0, int64_t board_1)
     return s_1 + s_2 + s_3;
 }
 
-int othello_ai::get_disks_able(int64_t board_0, int64_t board_1)
+int othello_ai::get_disks_able(std::pair<int64_t, int64_t> board)
 {
     
 }
 
-int othello_ai::get_disks_all(int64_t board_0, int64_t board_1)
+int othello_ai::get_disks_all(std::pair<int64_t, int64_t> board)
 {
-    int disks = 0;
-    for (const auto& e1 : board_)
-    {
-        for (const auto& e2 : e1)
-        {
-            if (e2 != 0)
-            {
-                disks++;
-            }
-        }
-    }
-    return disks;
+    
 }
 
-int othello_ai::get_disks(int64_t board_0, int64_t board_1)
+int othello_ai::get_disks(int64_t board)
 {
-    int disks = 0;
-    for (const auto& e1 : board_)
-    {
-        for (const auto& e2 : e1)
-        {
-            if (e2 == disk_)
-            {
-                disks++;
-            }
-        }
-    }
-    return disks;
+    
 }
 
 double othello_ai::f_1(double x)
