@@ -420,19 +420,35 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
 double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
-    if (r.empty() || depth_ <= 0 || std::clock() - time_start_ > time_max)
+    if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(board_, disk_);
     }
-    for (const auto& e : r)
+    else if (r.empty())
     {
-        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, time_start_, -beta_, -alpha_));
-        if (alpha_ >= beta_)
+        r = get_place_able(board_, -disk_);
+        if (r.empty())
         {
-            return alpha_;
+            return evaluation(board_, disk_);
+        }
+        else
+        {
+            return std::max(alpha_, -alphabeta(board_, disk_ * -1, depth_ - 1, time_start_, -beta_, -alpha_));
+            std::cout << 1 << std::endl;
         }
     }
-    return alpha_;
+    else
+    {
+        for (const auto& e : r)
+        {
+            alpha_ = std::max(alpha_, -alphabeta(get_board_placed(board_, e, disk_), disk_ * -1, depth_ - 1, time_start_, -beta_, -alpha_));
+            if (alpha_ >= beta_)
+            {
+                return alpha_;
+            }
+        }
+        return alpha_;
+    }
 }
 
 double othello_ai::evaluation(std::vector<std::vector<int>> board_, int disk_)
