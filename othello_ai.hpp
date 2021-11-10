@@ -46,32 +46,20 @@ othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, i
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_, int disk_)
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
-    std::vector<double> val(r.size());
+    const int size = r.size();
+    std::vector<double> val(size);
 #pragma omp parallel for
-    for (int i = 0; i < r.size(); i++)
+    for (int i = 0; i < size; i++)
     {
         val[i] = mode * -alphabeta(get_board_placed(board_, r[i], disk_), disk_ * -1, depth_min, std::clock(), -inf, inf);
     }
-    /*
-    std::vector<std::pair<double, std::pair<int, int>>> s;
-    for (int i = 0; i < r.size(); i++)
+    std::vector<std::pair<double, std::pair<int, int>>> s(size);
+    for (int i = 0; i < size; i++)
     {
         s[i] = std::make_pair(val[i], r[i]);
     }
     sort(s.begin(), s.end(), std::greater<std::pair<double, std::pair<int, int>>>());
     return s[0].second;
-    */
-    double val_max = -inf;
-    int i_max = 0;
-    for (int i = 0; i < r.size(); i++)
-    {
-        if (val_max < val[i])
-        {
-            val_max = val[i];
-            i_max = i;
-        }
-    }
-    return r[i_max];
 }
 
 std::vector<std::pair<int, int>> othello_ai::get_place_able(std::vector<std::vector<int>> board_, int disk_)
