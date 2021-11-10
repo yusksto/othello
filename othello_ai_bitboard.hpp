@@ -21,8 +21,8 @@ class othello_ai
         int time_max; //探索最大時間 [ms]
 
         //関数
-        std::pair<int64_t, int64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_);
-        std::vector<std::vector<int>> convert_bitboard_to_vector(std::pair<int64_t, int64_t> bitboard_);
+        std::pair<int64_t, int64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_); //vectorからbitboardへ変換
+        std::pair<int, int> convert_bitboard_to_pair(int64_t bitboard_); //bitboardからpairへ変換
         std::vector<int64_t> get_place_able(std::pair<int64_t, int64_t> bitboard_); //設置可能場所取得
         std::pair<int64_t, int64_t> get_board_placed(std::pair<int64_t, int64_t> bitboard_, int64_t place_); //設置後盤面取得
         double alphabeta(std::pair<int64_t, int64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
@@ -46,12 +46,12 @@ othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, i
     time_max = time_max_;
 }
 
-std::pair<int64_t, int64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
+std::pair<int64_t, int64_t> othello_ai::convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
 {
 
 }
 
-std::vector<std::vector<int>> convert_bitboard_to_vector(std::pair<int64_t, int64_t> bitboard_)
+std::pair<int, int> othello_ai::convert_bitboard_to_pair(int64_t bitboard_)
 {
 
 }
@@ -60,32 +60,20 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
 {
     std::pair<int64_t, int64_t> bitboard = convert_vector_to_bitboard(board_vector_);
     std::vector<int64_t> r = get_place_able(bitboard);
-    std::vector<double> val(r.size());
+    const int size = r.size();
+    std::vector<double> val(size);
 #pragma omp parallel for
-    for (int i = 0; i < r.size(); i++)
+    for (int i = 0; i < size; i++)
     {
         val[i] = mode * -alphabeta(get_board_placed(bitboard, r[i]), depth_min, std::clock(), -inf, inf);
     }
-    /*
-    std::vector<std::pair<double, std::pair<int, int>>> s;
-    for (int i = 0; i < r.size(); i++)
+    std::vector<std::pair<double, int64_t>> s(size);
+    for (int i = 0; i < size; i++)
     {
         s[i] = std::make_pair(val[i], r[i]);
     }
     sort(s.begin(), s.end(), std::greater<std::pair<double, std::pair<int, int>>>());
-    return s[0].second;
-    */
-    double val_max = -inf;
-    int i_max = 0;
-    for (int i = 0; i < r.size(); i++)
-    {
-        if (val_max < val[i])
-        {
-            val_max = val[i];
-            i_max = i;
-        }
-    }
-    return r[i_max];
+    return convert_bitboard_to_pair(s[0].second);
 }
 
 std::vector<int64_t> othello_ai::get_place_able(std::pair<int64_t, int64_t> bitboard_)
