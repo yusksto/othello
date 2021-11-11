@@ -422,7 +422,6 @@ double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, in
         else
         {
             return std::max(alpha_, -alphabeta(board_, disk_ * -1, depth_ - 1, time_start_, -beta_, -alpha_));
-            std::cout << 1 << std::endl;
         }
     }
     else
