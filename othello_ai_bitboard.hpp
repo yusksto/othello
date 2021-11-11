@@ -23,6 +23,7 @@ class othello_ai
         //関数
         std::pair<uint64_t, uint64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_); //vectorからbitboardへ変換
         std::pair<int, int> convert_bitboard_to_pair(uint64_t bitboard_); //bitboardからpairへ変換
+        uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_); //合法手bitboard作成
         std::vector<uint64_t> get_place_able(std::pair<uint64_t, uint64_t> bitboard_); //設置可能場所取得
         std::pair<uint64_t, uint64_t> get_board_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t place_); //設置後盤面取得
         double alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
@@ -46,16 +47,6 @@ othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, i
     time_max = time_max_;
 }
 
-std::pair<uint64_t, uint64_t> othello_ai::convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
-{
-
-}
-
-std::pair<int, int> othello_ai::convert_bitboard_to_pair(uint64_t bitboard_)
-{
-
-}
-
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_vector_, int disk_)
 {
     std::pair<uint64_t, uint64_t> bitboard = convert_vector_to_bitboard(board_vector_);
@@ -74,6 +65,100 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     }
     sort(s.begin(), s.end(), std::greater<std::pair<double, std::pair<int, int>>>());
     return convert_bitboard_to_pair(s[0].second);
+}
+
+std::pair<uint64_t, uint64_t> othello_ai::convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
+{
+
+}
+
+std::pair<int, int> othello_ai::convert_bitboard_to_pair(uint64_t bitboard_)
+{
+    
+}
+
+uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
+{
+    const uint64_t biboard_1 = bitboard_.first;
+    const uint64_t biboard_2 = bitboard_.second;
+    const uint64_t horizon  = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
+    const uint64_t vertical = bitboard_.second & 0x00FFFFFFFFFFFF00;
+    const uint64_t allside  = bitboard_.second & 0x007e7e7e7e7e7e00;
+    const uint64_t blankboard = ~(bitboard_.first | bitboard_.second);
+    uint64_t tmp = 0x0000000000000000;
+    uint64_t legalboard = 0x0000000000000000;
+
+    tmp = horizon & (biboard_1 << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    legalboard = blankboard & (tmp << 1);
+
+    //右
+    tmp = horizon & (biboard_1 >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    legalboard |= blankboard & (tmp >> 1);
+
+    //上
+    tmp = vertical & (biboard_1 << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    legalboard |= blankboard & (tmp << 8);
+
+    //下
+    tmp = vertical & (biboard_1 >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    legalboard |= blankboard & (tmp >> 8);
+
+    //右斜め上
+    tmp = allside & (biboard_1 << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    legalboard |= blankboard & (tmp << 7);
+
+    //左斜め上
+    tmp = allside & (biboard_1 << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    legalboard |= blankboard & (tmp << 9);
+
+    //右斜め下
+    tmp = allside & (biboard_1 >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    legalboard |= blankboard & (tmp >> 9);
+
+    //左斜め下
+    tmp = allside & (biboard_1 >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    legalboard |= blankboard & (tmp >> 7);
+    return legalboard;
 }
 
 std::vector<uint64_t> othello_ai::get_place_able(std::pair<uint64_t, uint64_t> bitboard_)
