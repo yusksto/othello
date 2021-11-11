@@ -21,15 +21,15 @@ class othello_ai
         int time_max; //探索最大時間 [ms]
 
         //関数
-        std::pair<int64_t, int64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_); //vectorからbitboardへ変換
-        std::pair<int, int> convert_bitboard_to_pair(int64_t bitboard_); //bitboardからpairへ変換
-        std::vector<int64_t> get_place_able(std::pair<int64_t, int64_t> bitboard_); //設置可能場所取得
-        std::pair<int64_t, int64_t> get_board_placed(std::pair<int64_t, int64_t> bitboard_, int64_t place_); //設置後盤面取得
-        double alphabeta(std::pair<int64_t, int64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
-        double evaluation(std::pair<int64_t, int64_t> bitboard_); //評価関数
-        int get_disks_able(std::pair<int64_t, int64_t> bitboard_); //設置可能場所数取得
-        int get_disks_all(std::pair<int64_t, int64_t> bitboard_); //石の数取得
-        int get_disks(int64_t bitboard_); //石の数取得
+        std::pair<uint64_t, uint64_t> convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_); //vectorからbitboardへ変換
+        std::pair<int, int> convert_bitboard_to_pair(uint64_t bitboard_); //bitboardからpairへ変換
+        std::vector<uint64_t> get_place_able(std::pair<uint64_t, uint64_t> bitboard_); //設置可能場所取得
+        std::pair<uint64_t, uint64_t> get_board_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t place_); //設置後盤面取得
+        double alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_); //αβ探索
+        double evaluation(std::pair<uint64_t, uint64_t> bitboard_); //評価関数
+        int get_disks_able(std::pair<uint64_t, uint64_t> bitboard_); //設置可能場所数取得
+        int get_disks_all(std::pair<uint64_t, uint64_t> bitboard_); //石の数取得
+        int get_disks(uint64_t bitboard_); //石の数取得
 
         //その他定数、活性化関数
         const double inf = std::numeric_limits<double>::infinity();
@@ -46,20 +46,20 @@ othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, i
     time_max = time_max_;
 }
 
-std::pair<int64_t, int64_t> othello_ai::convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
+std::pair<uint64_t, uint64_t> othello_ai::convert_vector_to_bitboard(std::vector<std::vector<int>> board_vector_)
 {
 
 }
 
-std::pair<int, int> othello_ai::convert_bitboard_to_pair(int64_t bitboard_)
+std::pair<int, int> othello_ai::convert_bitboard_to_pair(uint64_t bitboard_)
 {
 
 }
 
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_vector_, int disk_)
 {
-    std::pair<int64_t, int64_t> bitboard = convert_vector_to_bitboard(board_vector_);
-    std::vector<int64_t> r = get_place_able(bitboard);
+    std::pair<uint64_t, uint64_t> bitboard = convert_vector_to_bitboard(board_vector_);
+    std::vector<uint64_t> r = get_place_able(bitboard);
     const int size = r.size();
     std::vector<double> val(size);
 #pragma omp parallel for
@@ -67,7 +67,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     {
         val[i] = mode * -alphabeta(get_board_placed(bitboard, r[i]), depth_min, std::clock(), -inf, inf);
     }
-    std::vector<std::pair<double, int64_t>> s(size);
+    std::vector<std::pair<double, uint64_t>> s(size);
     for (int i = 0; i < size; i++)
     {
         s[i] = std::make_pair(val[i], r[i]);
@@ -76,19 +76,19 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     return convert_bitboard_to_pair(s[0].second);
 }
 
-std::vector<int64_t> othello_ai::get_place_able(std::pair<int64_t, int64_t> bitboard_)
+std::vector<uint64_t> othello_ai::get_place_able(std::pair<uint64_t, uint64_t> bitboard_)
 {
     
 }
 
-std::pair<int64_t, int64_t> othello_ai::get_board_placed(std::pair<int64_t, int64_t> bitboard_, int64_t place_)
+std::pair<uint64_t, uint64_t> othello_ai::get_board_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t place_)
 {
     
 }
 
-double othello_ai::alphabeta(std::pair<int64_t, int64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
+double othello_ai::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
-    std::vector<int64_t> r = get_place_able(bitboard_);
+    std::vector<uint64_t> r = get_place_able(bitboard_);
     if (r.empty() || depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(bitboard_);
@@ -104,7 +104,7 @@ double othello_ai::alphabeta(std::pair<int64_t, int64_t> bitboard_, int depth_, 
     return alpha_;
 }
 
-double othello_ai::evaluation(std::pair<int64_t, int64_t> bitboard_)
+double othello_ai::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 {
     double n = double(get_disks_all(bitboard_)) / 64.; //盤面進行度 [0:1]
 
@@ -140,19 +140,32 @@ double othello_ai::evaluation(std::pair<int64_t, int64_t> bitboard_)
     return s_1 + s_2 + s_3;
 }
 
-int othello_ai::get_disks_able(std::pair<int64_t, int64_t> bitboard_)
+int othello_ai::get_disks_able(std::pair<uint64_t, uint64_t> bitboard_)
 {
     
 }
 
-int othello_ai::get_disks_all(std::pair<int64_t, int64_t> bitboard_)
+int othello_ai::get_disks_all(std::pair<uint64_t, uint64_t> bitboard_)
 {
-    
+    uint64_t bitboard = bitboard_.first | bitboard_.second;
+    bitboard = (bitboard & 0x5555555555555555) + ((bitboard & 0xAAAAAAAAAAAAAAAA) >> 1);
+    bitboard = (bitboard & 0x3333333333333333) + ((bitboard & 0xCCCCCCCCCCCCCCCC) >> 2);
+    bitboard = (bitboard & 0x0F0F0F0F0F0F0F0F) + ((bitboard & 0xF0F0F0F0F0F0F0F0) >> 4);
+    bitboard = (bitboard & 0x00FF00FF00FF00FF) + ((bitboard & 0xFF00FF00FF00FF00) >> 8);
+    bitboard = (bitboard & 0x0000FFFF0000FFFF) + ((bitboard & 0xFFFF0000FFFF0000) >> 16);
+    bitboard = (bitboard & 0x00000000FFFFFFFF) + ((bitboard & 0xFFFFFFFF00000000) >> 32);
+    return bitboard;
 }
 
-int othello_ai::get_disks(int64_t bitboard_)
+int othello_ai::get_disks(uint64_t bitboard_)
 {
-    
+    bitboard_ = (bitboard_ & 0x5555555555555555) + ((bitboard_ & 0xAAAAAAAAAAAAAAAA) >> 1);
+    bitboard_ = (bitboard_ & 0x3333333333333333) + ((bitboard_ & 0xCCCCCCCCCCCCCCCC) >> 2);
+    bitboard_ = (bitboard_ & 0x0F0F0F0F0F0F0F0F) + ((bitboard_ & 0xF0F0F0F0F0F0F0F0) >> 4);
+    bitboard_ = (bitboard_ & 0x00FF00FF00FF00FF) + ((bitboard_ & 0xFF00FF00FF00FF00) >> 8);
+    bitboard_ = (bitboard_ & 0x0000FFFF0000FFFF) + ((bitboard_ & 0xFFFF0000FFFF0000) >> 16);
+    bitboard_ = (bitboard_ & 0x00000000FFFFFFFF) + ((bitboard_ & 0xFFFFFFFF00000000) >> 32);
+    return bitboard_;
 }
 
 double othello_ai::f_1(double x)
