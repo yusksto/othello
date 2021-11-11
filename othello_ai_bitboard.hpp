@@ -50,6 +50,7 @@ othello_ai::othello_ai(std::vector<std::vector<double>> parameter_, int mode_, i
 std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board_vector_, int disk_)
 {
     std::pair<uint64_t, uint64_t> bitboard = convert_vector_to_bitboard(board_vector_);
+    uint64_t legalboard = get_legalboard(bitboard);
     std::vector<uint64_t> r = get_place_able(bitboard);
     const int size = r.size();
     std::vector<double> val(size);
@@ -174,19 +175,34 @@ std::pair<uint64_t, uint64_t> othello_ai::get_board_placed(std::pair<uint64_t, u
 double othello_ai::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     std::vector<uint64_t> r = get_place_able(bitboard_);
-    if (r.empty() || depth_ <= 0 || std::clock() - time_start_ > time_max)
+    if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(bitboard_);
     }
-    for (const auto& e : r)
+    else if (r.empty())
     {
-        alpha_ = std::max(alpha_, -alphabeta(get_board_placed(bitboard_, e), depth_ - 1, time_start_, -beta_, -alpha_));
-        if (alpha_ >= beta_)
+        r = get_place_able(bitboard_);
+        if (r.empty())
         {
-            return alpha_;
+            return evaluation(bitboard_);
+        }
+        else
+        {
+            return std::max(alpha_, -alphabeta(bitboard_, depth_ - 1, time_start_, -beta_, -alpha_));
         }
     }
-    return alpha_;
+    else
+    {
+         for (const auto& e : r)
+        {
+            alpha_ = std::max(alpha_, -alphabeta(get_board_placed(bitboard_, e), depth_ - 1, time_start_, -beta_, -alpha_));
+            if (alpha_ >= beta_)
+            {
+                return alpha_;
+            }
+        }
+        return alpha_;
+    }
 }
 
 double othello_ai::evaluation(std::pair<uint64_t, uint64_t> bitboard_)

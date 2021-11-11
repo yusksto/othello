@@ -408,7 +408,6 @@ std::vector<std::vector<int>> othello_ai::get_board_placed(std::vector<std::vect
 double othello_ai::alphabeta(std::vector<std::vector<int>> board_, int disk_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
-    std::vector<std::pair<int, int>> r = get_place_able(board_, disk_);
     if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(board_, disk_);
