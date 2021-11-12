@@ -194,14 +194,12 @@ std::pair<int, int> othello_ai::convert_putboard_to_pair(uint64_t putboard_)
 std::vector<uint64_t> convert_legalboard_to_putboard(uint64_t legalboard_)
 {
     std::vector<uint64_t> putboard;
-    uint64_t tmp = 0x8000000000000000;
-    for (int i = 0; i < 64; i++)
+    uint64_t tmp = 0x0000000000000000;
+    while (legalboard_)
     {
-        if (legalboard_ & tmp)
-        {
-            putboard.push_back(tmp);
-        }
-        tmp >>= 1;
+        tmp = -legalboard_ & legalboard_;
+        putboard.push_back(tmp);
+        legalboard_ ^= tmp;
     }
     return putboard;
 }

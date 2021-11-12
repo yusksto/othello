@@ -54,5 +54,6 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "fstream": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
