@@ -54,7 +54,7 @@ std::pair<int, int> othello_ai::get_place_ai(std::vector<std::vector<int>> board
     std::vector<uint64_t> putboard = convert_legalboard_to_putboard(legalboard);
     const int size = get_disks(legalboard);
     std::vector<double> val(size);
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int i = 0; i < size; i++)
     {
         val[i] = mode * -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth_min, std::clock(), -inf, inf);
@@ -102,6 +102,7 @@ uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
     uint64_t tmp = 0x0000000000000000;
     uint64_t legalboard = 0x0000000000000000;
 
+    //左
     tmp = horizon & (bitboard_1 << 1);
     tmp |= horizon & (tmp << 1);
     tmp |= horizon & (tmp << 1);
@@ -208,85 +209,121 @@ std::pair<uint64_t, uint64_t> othello_ai::get_bitboard_placed(std::pair<uint64_t
 {
     const uint64_t bitboard_1 = bitboard_.first;
     const uint64_t bitboard_2 = bitboard_.second;
-    const uint64_t horizon  = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
-    const uint64_t vertical = bitboard_2 & 0x00FFFFFFFFFFFF00;
-    const uint64_t allside  = bitboard_2 & 0x007e7e7e7e7e7e00;
-    const uint64_t blankboard = ~(bitboard_1 | bitboard_2);
-    uint64_t tmp = 0x0000000000000000;
-    uint64_t rev = 0x0000000000000000;
+    const uint64_t horizon    = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
+    const uint64_t vertical   = bitboard_2 & 0x00FFFFFFFFFFFF00;
+    const uint64_t allside    = bitboard_2 & 0x007e7e7e7e7e7e00;
+    uint64_t rev  = 0x0000000000000000;
     uint64_t rev_ = 0x0000000000000000;
-
+    uint64_t tmp  = 0x0000000000000000;
+    
+    //反転石rev
+    //左
     tmp = horizon & (putboard_ << 1);
-    tmp |= horizon & (tmp << 1);
-    tmp |= horizon & (tmp << 1);
-    tmp |= horizon & (tmp << 1);
-    tmp |= horizon & (tmp << 1);
-    tmp |= horizon & (tmp << 1);
-    rev_ = blankboard & (tmp << 1);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = horizon & (tmp << 1);
+    }
+    if (bitboard_1 & (rev_ << 1))
+    {
+        rev |= rev_;
+    }
 
     //右
+    rev_ = 0x0000000000000000;
     tmp = horizon & (putboard_ >> 1);
-    tmp |= horizon & (tmp >> 1);
-    tmp |= horizon & (tmp >> 1);
-    tmp |= horizon & (tmp >> 1);
-    tmp |= horizon & (tmp >> 1);
-    tmp |= horizon & (tmp >> 1);
-    rev_ |= blankboard & (tmp >> 1);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = horizon & (tmp >> 1);
+    }
+    if (bitboard_1 & (rev_ >> 1))
+    {
+        rev |= rev_;
+    }
 
     //上
+    rev_ = 0x0000000000000000;
     tmp = vertical & (putboard_ << 8);
-    tmp |= vertical & (tmp << 8);
-    tmp |= vertical & (tmp << 8);
-    tmp |= vertical & (tmp << 8);
-    tmp |= vertical & (tmp << 8);
-    tmp |= vertical & (tmp << 8);
-    rev_ |= blankboard & (tmp << 8);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = vertical & (tmp << 8);
+    }
+    if (bitboard_1 & (rev_ << 8))
+    {
+        rev |= rev_;
+    }
 
     //下
+    rev_ = 0x0000000000000000;
     tmp = vertical & (putboard_ >> 8);
-    tmp |= vertical & (tmp >> 8);
-    tmp |= vertical & (tmp >> 8);
-    tmp |= vertical & (tmp >> 8);
-    tmp |= vertical & (tmp >> 8);
-    tmp |= vertical & (tmp >> 8);
-    rev_ |= blankboard & (tmp >> 8);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = vertical & (tmp >> 8);
+    }
+    if (bitboard_1 & (rev_ >> 8))
+    {
+        rev |= rev_;
+    }
 
     //右斜め上
+    rev_ = 0x0000000000000000;
     tmp = allside & (putboard_ << 7);
-    tmp |= allside & (tmp << 7);
-    tmp |= allside & (tmp << 7);
-    tmp |= allside & (tmp << 7);
-    tmp |= allside & (tmp << 7);
-    tmp |= allside & (tmp << 7);
-    rev_ |= blankboard & (tmp << 7);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = allside & (tmp << 7);
+    }
+    if (bitboard_1 & (rev_ << 7))
+    {
+        rev |= rev_;
+    }
 
     //左斜め上
+    rev_ = 0x0000000000000000;
     tmp = allside & (putboard_ << 9);
-    tmp |= allside & (tmp << 9);
-    tmp |= allside & (tmp << 9);
-    tmp |= allside & (tmp << 9);
-    tmp |= allside & (tmp << 9);
-    tmp |= allside & (tmp << 9);
-    rev_ |= blankboard & (tmp << 9);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = allside & (tmp << 9);
+    }
+    if (bitboard_1 & (rev_ << 9))
+    {
+        rev |= rev_;
+    }
 
     //右斜め下
+    rev_ = 0x0000000000000000;
     tmp = allside & (putboard_ >> 9);
-    tmp |= allside & (tmp >> 9);
-    tmp |= allside & (tmp >> 9);
-    tmp |= allside & (tmp >> 9);
-    tmp |= allside & (tmp >> 9);
-    tmp |= allside & (tmp >> 9);
-    rev_ |= blankboard & (tmp >> 9);
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = allside & (tmp >> 9);
+    }
+    if (bitboard_1 & (rev_ >> 9))
+    {
+        rev |= rev_;
+    }
 
     //左斜め下
+    rev_ = 0x0000000000000000;
     tmp = allside & (putboard_ >> 7);
-    tmp |= allside & (tmp >> 7);
-    tmp |= allside & (tmp >> 7);
-    tmp |= allside & (tmp >> 7);
-    tmp |= allside & (tmp >> 7);
-    tmp |= allside & (tmp >> 7);
-    rev_ |= blankboard & (tmp >> 7);
-    return legalboard;
+    while (tmp)
+    {
+        rev_ |= tmp;
+        tmp = allside & (tmp >> 7);
+    }
+    if (bitboard_1 & (rev_ >> 7))
+    {
+        rev |= rev_;
+    }
+
+    //反転
+    bitboard_.first ^= putboard_ | rev;
+    bitboard_.second ^= rev;
+    return bitboard_;
 }
 
 double othello_ai::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
