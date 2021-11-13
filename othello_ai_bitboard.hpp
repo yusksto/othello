@@ -11,7 +11,7 @@ class othello_ai_bitboard
 {
     public:
         othello_ai_bitboard(std::vector<std::vector<double>> parameter_, int mode_, int depth_min_, int time_max_); //othello_ai_bitboardセット
-        std::pair<int, int> get_place_ai(std::vector<std::vector<int>> board_vector_, int disk_); //ai設置場所取得
+        std::pair<int, int> get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_); //ai設置場所取得
 
     private:
         //変数
@@ -31,6 +31,7 @@ class othello_ai_bitboard
 
         int get_disks(std::pair<uint64_t, uint64_t> bitboard_); //石の数取得
         int get_disks(uint64_t bitboard_); //石の数取得
+        void swap_pair(std::pair<uint64_t, uint64_t> &a);
 
         //その他定数、活性化関数
         const double inf = std::numeric_limits<double>::infinity();
@@ -47,9 +48,9 @@ othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<double>> parame
     time_max = time_max_;
 }
 
-std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<int>> board_vector_, int disk_)
+std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_)
 {
-    std::pair<uint64_t, uint64_t> bitboard = convert_vectorboard_to_bitboard(board_vector_, disk_);
+    std::pair<uint64_t, uint64_t> bitboard = convert_vectorboard_to_bitboard(vectorboard_, disk_);
     uint64_t legalboard = get_legalboard(bitboard);
     std::vector<uint64_t> putboard = convert_legalboard_to_putboard(legalboard);
     const int size = get_disks(legalboard);
