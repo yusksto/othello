@@ -21,7 +21,7 @@ class othello_ai
         int time_max; //探索最大時間 [ms]
 
         //関数
-        std::pair<uint64_t, uint64_t> othello_ai::convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
+        std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
         uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_); //合法手bitboard作成
         std::vector<uint64_t> convert_legalboard_to_putboard(uint64_t legalboard_); //合法手boardからvector<指手board>へ変換
         std::pair<int, int> convert_putboard_to_pair(uint64_t putboard_); //bitboardからpairへ変換
@@ -91,7 +91,7 @@ std::pair<uint64_t, uint64_t> othello_ai::convert_vectorboard_to_bitboard(std::v
     return std::make_pair(bitboard_1, bitboard_2);  
 }
 
-uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
+uint64_t othello_ai::get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
 {
     const uint64_t bitboard_1 = bitboard_.first;
     const uint64_t bitboard_2 = bitboard_.second;
@@ -192,7 +192,7 @@ std::pair<int, int> othello_ai::convert_putboard_to_pair(uint64_t putboard_)
     }
 }
 
-std::vector<uint64_t> convert_legalboard_to_putboard(uint64_t legalboard_)
+std::vector<uint64_t> othello_ai::convert_legalboard_to_putboard(uint64_t legalboard_)
 {
     std::vector<uint64_t> putboard;
     uint64_t tmp = 0x0000000000000000;
@@ -207,11 +207,11 @@ std::vector<uint64_t> convert_legalboard_to_putboard(uint64_t legalboard_)
 
 std::pair<uint64_t, uint64_t> othello_ai::get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_)
 {
-    const uint64_t bitboard_1 = bitboard_.first;
-    const uint64_t bitboard_2 = bitboard_.second;
-    const uint64_t horizon    = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
-    const uint64_t vertical   = bitboard_2 & 0x00FFFFFFFFFFFF00;
-    const uint64_t allside    = bitboard_2 & 0x007e7e7e7e7e7e00;
+    uint64_t bitboard_1 = bitboard_.first;
+    uint64_t bitboard_2 = bitboard_.second;
+    uint64_t horizon    = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
+    uint64_t vertical   = bitboard_2 & 0x00FFFFFFFFFFFF00;
+    uint64_t allside    = bitboard_2 & 0x007e7e7e7e7e7e00;
     uint64_t rev  = 0x0000000000000000;
     uint64_t rev_ = 0x0000000000000000;
     uint64_t tmp  = 0x0000000000000000;
@@ -321,9 +321,9 @@ std::pair<uint64_t, uint64_t> othello_ai::get_bitboard_placed(std::pair<uint64_t
     }
 
     //反転
-    bitboard_.first ^= putboard_ | rev;
-    bitboard_.second ^= rev;
-    return bitboard_;
+    bitboard_1 ^= putboard_ | rev;
+    bitboard_2 ^= rev;
+    return std::make_pair(bitboard_2, bitboard_1);
 }
 
 double othello_ai::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
