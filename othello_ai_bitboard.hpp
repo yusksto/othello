@@ -366,11 +366,20 @@ double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 
     //盤面配置良さ s_1[-1:1]
     double s_1 = 0;
+    uint64_t tmp = 0x8000000000000000;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            //s_1 += double(disk) * double(board[i][j]) * parameter[i][j] / 64.;
+            if (bitboard_.first & tmp)
+            {
+                s_1 += parameter[i][j] / 64.;
+            }
+            else if (bitboard_.second & tmp)
+            {
+                s_1 -= parameter[i][j] / 64.;
+            }
+            tmp >>= 1;
         }
     }
     s_1 *= f_1(f_1(pow(f_1(n), 4)));
