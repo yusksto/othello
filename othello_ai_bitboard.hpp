@@ -94,17 +94,15 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboa
 
 uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
 {
-    const uint64_t bitboard_1 = bitboard_.first;
-    const uint64_t bitboard_2 = bitboard_.second;
-    const uint64_t horizon  = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
-    const uint64_t vertical = bitboard_2 & 0x00FFFFFFFFFFFF00;
-    const uint64_t allside  = bitboard_2 & 0x007e7e7e7e7e7e00;
-    const uint64_t blankboard = ~(bitboard_1 | bitboard_2);
+    const uint64_t horizon  = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
+    const uint64_t vertical = bitboard_.second & 0x00FFFFFFFFFFFF00;
+    const uint64_t allside  = bitboard_.second & 0x007e7e7e7e7e7e00;
+    const uint64_t blankboard = ~(bitboard_.first | bitboard_.second);
     uint64_t tmp = 0x0000000000000000;
     uint64_t legalboard = 0x0000000000000000;
 
     //左
-    tmp = horizon & (bitboard_1 << 1);
+    tmp = horizon & (bitboard_.first << 1);
     tmp |= horizon & (tmp << 1);
     tmp |= horizon & (tmp << 1);
     tmp |= horizon & (tmp << 1);
@@ -113,7 +111,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard = blankboard & (tmp << 1);
 
     //右
-    tmp = horizon & (bitboard_1 >> 1);
+    tmp = horizon & (bitboard_.first >> 1);
     tmp |= horizon & (tmp >> 1);
     tmp |= horizon & (tmp >> 1);
     tmp |= horizon & (tmp >> 1);
@@ -122,7 +120,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp >> 1);
 
     //上
-    tmp = vertical & (bitboard_1 << 8);
+    tmp = vertical & (bitboard_.first << 8);
     tmp |= vertical & (tmp << 8);
     tmp |= vertical & (tmp << 8);
     tmp |= vertical & (tmp << 8);
@@ -131,7 +129,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp << 8);
 
     //下
-    tmp = vertical & (bitboard_1 >> 8);
+    tmp = vertical & (bitboard_.first >> 8);
     tmp |= vertical & (tmp >> 8);
     tmp |= vertical & (tmp >> 8);
     tmp |= vertical & (tmp >> 8);
@@ -140,7 +138,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp >> 8);
 
     //右斜め上
-    tmp = allside & (bitboard_1 << 7);
+    tmp = allside & (bitboard_.first << 7);
     tmp |= allside & (tmp << 7);
     tmp |= allside & (tmp << 7);
     tmp |= allside & (tmp << 7);
@@ -149,7 +147,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp << 7);
 
     //左斜め上
-    tmp = allside & (bitboard_1 << 9);
+    tmp = allside & (bitboard_.first << 9);
     tmp |= allside & (tmp << 9);
     tmp |= allside & (tmp << 9);
     tmp |= allside & (tmp << 9);
@@ -158,7 +156,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp << 9);
 
     //右斜め下
-    tmp = allside & (bitboard_1 >> 9);
+    tmp = allside & (bitboard_.first >> 9);
     tmp |= allside & (tmp >> 9);
     tmp |= allside & (tmp >> 9);
     tmp |= allside & (tmp >> 9);
@@ -167,7 +165,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     legalboard |= blankboard & (tmp >> 9);
 
     //左斜め下
-    tmp = allside & (bitboard_1 >> 7);
+    tmp = allside & (bitboard_.first >> 7);
     tmp |= allside & (tmp >> 7);
     tmp |= allside & (tmp >> 7);
     tmp |= allside & (tmp >> 7);
@@ -195,24 +193,24 @@ std::pair<int, int> othello_ai_bitboard::convert_putboard_to_pair(uint64_t putbo
 
 std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard(uint64_t legalboard_)
 {
-    std::vector<uint64_t> putboard;
+    std::vector<uint64_t> putboard(get_disks(legalboard_));
     uint64_t tmp = 0x0000000000000000;
+    int i = 0;
     while (legalboard_)
     {
         tmp = -int64_t(legalboard_) & legalboard_;
-        putboard.push_back(tmp);
+        putboard[i] = tmp;
         legalboard_ ^= tmp;
+        i++;
     }
     return putboard;
 }
 
 std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_)
 {
-    uint64_t bitboard_1 = bitboard_.first;
-    uint64_t bitboard_2 = bitboard_.second;
-    uint64_t horizon    = bitboard_2 & 0x7e7e7e7e7e7e7e7e;
-    uint64_t vertical   = bitboard_2 & 0x00FFFFFFFFFFFF00;
-    uint64_t allside    = bitboard_2 & 0x007e7e7e7e7e7e00;
+    uint64_t horizon    = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
+    uint64_t vertical   = bitboard_.second & 0x00FFFFFFFFFFFF00;
+    uint64_t allside    = bitboard_.second & 0x007e7e7e7e7e7e00;
     uint64_t rev  = 0x0000000000000000;
     uint64_t rev_ = 0x0000000000000000;
     uint64_t tmp  = 0x0000000000000000;
@@ -225,7 +223,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = horizon & (tmp << 1);
     }
-    if (bitboard_1 & (rev_ << 1))
+    if (bitboard_.first & (rev_ << 1))
     {
         rev |= rev_;
     }
@@ -238,7 +236,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = horizon & (tmp >> 1);
     }
-    if (bitboard_1 & (rev_ >> 1))
+    if (bitboard_.first & (rev_ >> 1))
     {
         rev |= rev_;
     }
@@ -251,7 +249,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = vertical & (tmp << 8);
     }
-    if (bitboard_1 & (rev_ << 8))
+    if (bitboard_.first & (rev_ << 8))
     {
         rev |= rev_;
     }
@@ -264,7 +262,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = vertical & (tmp >> 8);
     }
-    if (bitboard_1 & (rev_ >> 8))
+    if (bitboard_.first & (rev_ >> 8))
     {
         rev |= rev_;
     }
@@ -277,7 +275,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = allside & (tmp << 7);
     }
-    if (bitboard_1 & (rev_ << 7))
+    if (bitboard_.first & (rev_ << 7))
     {
         rev |= rev_;
     }
@@ -290,7 +288,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = allside & (tmp << 9);
     }
-    if (bitboard_1 & (rev_ << 9))
+    if (bitboard_.first & (rev_ << 9))
     {
         rev |= rev_;
     }
@@ -303,7 +301,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = allside & (tmp >> 9);
     }
-    if (bitboard_1 & (rev_ >> 9))
+    if (bitboard_.first & (rev_ >> 9))
     {
         rev |= rev_;
     }
@@ -316,28 +314,28 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
         rev_ |= tmp;
         tmp = allside & (tmp >> 7);
     }
-    if (bitboard_1 & (rev_ >> 7))
+    if (bitboard_.first & (rev_ >> 7))
     {
         rev |= rev_;
     }
 
     //反転
-    bitboard_1 ^= putboard_ | rev;
-    bitboard_2 ^= rev;
-    return std::make_pair(bitboard_2, bitboard_1);
+    bitboard_.first ^= putboard_ | rev;
+    bitboard_.second ^= rev;
+    return std::make_pair(bitboard_.second, bitboard_.first);
 }
 
 double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
-    std::vector<uint64_t> putboard = convert_legalboard_to_putboard(get_legalboard(bitboard_));
+    uint64_t legalboard = get_legalboard(bitboard_);
     if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(bitboard_);
     }
-    else if (putboard.empty())
+    else if (!legalboard)
     {
-        putboard = convert_legalboard_to_putboard(get_legalboard(std::make_pair(bitboard_.second, bitboard_.first)));
-        if (putboard.empty())
+        legalboard = get_legalboard(std::make_pair(bitboard_.second, bitboard_.first));
+        if (!legalboard)
         {
             return evaluation(bitboard_);
         }
@@ -348,13 +346,16 @@ double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, i
     }
     else
     {
-         for (const auto& e : putboard)
+        uint64_t putboard = 0x0000000000000000;
+        while (legalboard)
         {
-            alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, e), depth_ - 1, time_start_, -beta_, -alpha_));
+            putboard = -int64_t(legalboard) & legalboard;
+            alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, time_start_, -beta_, -alpha_));
             if (alpha_ >= beta_)
             {
                 return alpha_;
             }
+            legalboard ^= putboard;
         }
         return alpha_;
     }
