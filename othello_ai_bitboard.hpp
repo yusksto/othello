@@ -31,7 +31,6 @@ class othello_ai_bitboard
 
         int get_disks(std::pair<uint64_t, uint64_t> bitboard_); //石の数取得
         int get_disks(uint64_t bitboard_); //石の数取得
-        void swap_pair(std::pair<uint64_t, uint64_t> &a);
 
         //その他定数、活性化関数
         const double inf = std::numeric_limits<double>::infinity();
@@ -327,12 +326,12 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
 
 double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
-    uint64_t legalboard = get_legalboard(bitboard_);
     if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
         return evaluation(bitboard_);
     }
-    else if (!legalboard)
+    uint64_t legalboard = get_legalboard(bitboard_);
+    if (!legalboard)
     {
         legalboard = get_legalboard(std::make_pair(bitboard_.second, bitboard_.first));
         if (!legalboard)
