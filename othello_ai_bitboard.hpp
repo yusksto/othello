@@ -76,6 +76,8 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboa
     {
         for (int j = 0; j < 8; j++)
         {
+            bitboard_1 <<= 1;
+            bitboard_2 <<= 1;
             if (vectorboard_[i][j] == disk_)
             {
                 bitboard_1 |= 0x0000000000000001;
@@ -84,8 +86,6 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboa
             {
                 bitboard_2 |= 0x0000000000000001;
             }
-            bitboard_1 <<= 1;
-            bitboard_2 <<= 1;
         }
     }
     return std::make_pair(bitboard_1, bitboard_2);  
