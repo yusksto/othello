@@ -57,7 +57,7 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
 //#pragma omp parallel for
     for (int i = 0; i < size; i++)
     {
-        val[i] = mode * -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth_min, std::clock(), -inf, inf);
+        val[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth_min, std::clock(), -inf, inf);
     }
     std::vector<std::pair<double, uint64_t>> s(size);
     for (int i = 0; i < size; i++)
@@ -402,7 +402,7 @@ double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
         s_3 = double(disks_able_0 - disks_able_1) / double(disks_able_0 + disks_able_1) * f_3(n);
     }
 
-    return s_1 + s_2 + s_3;
+    return mode * (s_1 + s_2 + s_3);
 }
 
 int othello_ai_bitboard::get_disks(std::pair<uint64_t, uint64_t> bitboard_)
