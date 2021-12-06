@@ -68,7 +68,7 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     return convert_putboard_to_pair(s[0].second);
 }
 
-std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_)
+inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_)
 {
     uint64_t bitboard_1 = 0x0000000000000000;
     uint64_t bitboard_2 = 0x0000000000000000;
@@ -91,7 +91,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboa
     return std::make_pair(bitboard_1, bitboard_2);  
 }
 
-uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
+inline uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitboard_)
 {
     const uint64_t horizon  = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
     const uint64_t vertical = bitboard_.second & 0x00FFFFFFFFFFFF00;
@@ -174,7 +174,7 @@ uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t> bitbo
     return legalboard;
 }
 
-std::pair<int, int> othello_ai_bitboard::convert_putboard_to_pair(uint64_t putboard_)
+inline std::pair<int, int> othello_ai_bitboard::convert_putboard_to_pair(uint64_t putboard_)
 {
     uint64_t tmp = 0x8000000000000000;
     for (int i = 0; i < 8; i++)
@@ -190,7 +190,7 @@ std::pair<int, int> othello_ai_bitboard::convert_putboard_to_pair(uint64_t putbo
     }
 }
 
-std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard(uint64_t legalboard_)
+inline std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard(uint64_t legalboard_)
 {
     std::vector<uint64_t> putboard(get_disks(legalboard_));
     uint64_t tmp = 0x0000000000000000;
@@ -205,7 +205,7 @@ std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard(uint64
     return putboard;
 }
 
-std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_)
+inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_)
 {
     uint64_t horizon    = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
     uint64_t vertical   = bitboard_.second & 0x00FFFFFFFFFFFF00;
@@ -324,7 +324,7 @@ std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair
     return std::make_pair(bitboard_.second, bitboard_.first);
 }
 
-double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
+inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, clock_t time_start_, double alpha_, double beta_)
 {
     if (depth_ <= 0 || std::clock() - time_start_ > time_max)
     {
@@ -360,7 +360,7 @@ double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, i
     }
 }
 
-double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
+inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 {
     double n = double(get_disks(bitboard_)) / 64.; //盤面進行度 [0:1]
 
@@ -405,7 +405,7 @@ double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
     return mode * (s_1 + s_2 + s_3);
 }
 
-int othello_ai_bitboard::get_disks(std::pair<uint64_t, uint64_t> bitboard_)
+inline int othello_ai_bitboard::get_disks(std::pair<uint64_t, uint64_t> bitboard_)
 {
     uint64_t bitboard = bitboard_.first | bitboard_.second;
     bitboard = (bitboard & 0x5555555555555555) + ((bitboard & 0xAAAAAAAAAAAAAAAA) >> 1);
@@ -417,7 +417,7 @@ int othello_ai_bitboard::get_disks(std::pair<uint64_t, uint64_t> bitboard_)
     return bitboard;
 }
 
-int othello_ai_bitboard::get_disks(uint64_t bitboard_)
+inline int othello_ai_bitboard::get_disks(uint64_t bitboard_)
 {
     bitboard_ = (bitboard_ & 0x5555555555555555) + ((bitboard_ & 0xAAAAAAAAAAAAAAAA) >> 1);
     bitboard_ = (bitboard_ & 0x3333333333333333) + ((bitboard_ & 0xCCCCCCCCCCCCCCCC) >> 2);
@@ -428,17 +428,17 @@ int othello_ai_bitboard::get_disks(uint64_t bitboard_)
     return bitboard_;
 }
 
-double othello_ai_bitboard::f_1(double x)
+inline double othello_ai_bitboard::f_1(double x)
 {
     return pow(x, 2) * (-2 * x + 3);
 }
 
-double othello_ai_bitboard::f_2(double x)
+inline double othello_ai_bitboard::f_2(double x)
 {
     return pow(x, 2);
 }
 
-double othello_ai_bitboard::f_3(double x)
+inline double othello_ai_bitboard::f_3(double x)
 {
     return 16 * pow(x, 4) - 32 * pow(x, 3) + 16 * pow(x, 2);
 }
