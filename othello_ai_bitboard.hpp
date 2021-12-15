@@ -207,9 +207,9 @@ inline std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard
 
 inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_)
 {
-    uint64_t horizon    = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
-    uint64_t vertical   = bitboard_.second & 0x00FFFFFFFFFFFF00;
-    uint64_t allside    = bitboard_.second & 0x007e7e7e7e7e7e00;
+    uint64_t horizon  = bitboard_.second & 0x7e7e7e7e7e7e7e7e;
+    uint64_t vertical = bitboard_.second & 0x00FFFFFFFFFFFF00;
+    uint64_t allside  = bitboard_.second & 0x007e7e7e7e7e7e00;
     uint64_t rev  = 0x0000000000000000;
     uint64_t rev_ = 0x0000000000000000;
     uint64_t tmp  = 0x0000000000000000;
