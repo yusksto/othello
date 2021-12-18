@@ -24,6 +24,11 @@ public:
 othello_board::othello_board()
 {
     board = std::vector<std::vector<int>>(8, std::vector<int>(8, 0));
+    board[3][3] = 1;
+    board[3][4] = -1;
+    board[4][3] = -1;
+    board[4][4] = 1;
+    
     disks = 0;
     disks_white = 0;
     disks_black = 0;
@@ -43,6 +48,7 @@ void othello_board::show()
 
 void othello_board::set_board_default()//オセロ盤セット
 {
+    board = std::vector<std::vector<int>>(8, std::vector<int>(8, 0));
     board[3][3] = 1;
     board[3][4] = -1;
     board[4][3] = -1;
