@@ -384,7 +384,7 @@ inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitb
             tmp >>= 1;
         }
     }
-    s_1 *= f_1(f_1(pow(f_1(n), 4)));
+    s_1 *= (1 - f_1(f_1(pow(f_1(n), 4))));
     
     //石の数 s_2[-1:1]
     int disks_0 = get_disks(bitboard_.first);
@@ -400,7 +400,7 @@ inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitb
     }
     else
     {
-        s_2 = double(disks_0 - disks_1) / double(disks_0 + disks_1) * (1 - f_1(f_1(pow(f_1(n), 4))));
+        s_2 = double(disks_0 - disks_1) / double(disks_0 + disks_1) * f_1(f_1(pow(f_1(n), 4)));
     }
 
     //設置可能場所数 s_3[-1:1]
