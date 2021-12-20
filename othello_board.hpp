@@ -192,7 +192,7 @@ std::vector<std::pair<int, int>> othello_board::get_place_able(int disk_)//шинч╜
                         can_place = true;
                         break;
                     }
-                    else if (board[i - k][i - k] == 0)
+                    else if (board[i - k][j - k] == 0)
                     {
                         break;
                     }
