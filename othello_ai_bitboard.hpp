@@ -20,8 +20,8 @@ private:
     int depth_min; //探索最低深度 [0:)
     int time_max; //探索最大時間 [ms]
 
-    clock_t t_start; // αβ探索時間計測用
-    bool isTimeout; // αβ探索打ち切り用
+    clock_t t_start; //探索時間計測用
+    bool isTimeout; //探索打ち切り用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
@@ -76,6 +76,10 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
             {
                 val[i] = tmp[i];
             }
+        }
+        if (depth >= 64 - int(get_disks(bitboard)))
+        {
+            break;
         }
         depth++;
     }
