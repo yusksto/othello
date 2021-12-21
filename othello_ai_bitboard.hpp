@@ -22,6 +22,8 @@ private:
 
     clock_t t_start; //探索時間計測用
     bool isTimeout; //探索打ち切り用
+    std::vector<int> route_new, route_old; //探索経路記録用
+    double alpha_max; //最大評価値記録用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
@@ -60,29 +62,42 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     std::vector<double> tmp(size);
 
     // 反復深化深さ優先探索
-    t_start = clock();
-    isTimeout = false;
-    int depth = 0;
-    while (!isTimeout)
-    {
-//#pragma omp parallel for
-        for (int i = 0; i < size; i++)
-        {
-            tmp[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth, -inf, inf);
-        }
-        if (!isTimeout)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                val[i] = tmp[i];
-            }
-        }
-        if (depth >= 64 - int(get_disks(bitboard)))
-        {
-            break;
-        }
-        depth++;
-    }
+	t_start = clock();
+	isTimeout = false;
+	int depth = 0;
+	std::vector<std::vector<int>> route_list(size);
+	while (!isTimeout)
+	{
+		depth++;
+		for (int i = 0; i < size; i++)
+		{
+			alpha_max = -inf;
+			route_list[i].resize(depth);
+			route_list[i][0] = 0;
+			route_old.resize(depth - 1);
+			for (int j = 0; j < depth - 1; j++)
+			{
+				route_old[j] = route_list[i][j];
+			}
+			route_new.resize(depth);
+			tmp[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth - 1, -inf, inf);
+			for (int j = 0; j < depth; j++)
+			{
+				route_list[i][j] = route_new[j];
+			}
+		}
+		if (!isTimeout)
+		{
+			for (int i = 0; i < size; i++)
+			{
+				val[i] = tmp[i];
+			}
+		}
+		if (depth >= 64 - int(get_disks(bitboard)))
+		{
+			break;
+		}
+	}
 
     std::vector<std::pair<double, uint64_t>> s(size);
     for (int i = 0; i < size; i++)
@@ -352,7 +367,6 @@ inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(st
 inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, double alpha_, double beta_)
 {
     uint64_t legalboard = get_legalboard(bitboard_);
-    
     if (depth_ <= 0)
     {
         return evaluation(bitboard_);
@@ -360,7 +374,7 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
     else if (std::clock() - t_start > time_max)
     {
         isTimeout = true;
-        return evaluation(bitboard_);
+        return 0;
     }
     else if (!legalboard)
     {
@@ -378,15 +392,39 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
     else
     {
         uint64_t putboard = 0x0000000000000000;
+        uint64_t tmp = legalboard;
+        for (int i = 0; i < route_old[depth_]; i++)
+        {
+            putboard = -int64_t(tmp) & tmp;
+            tmp ^= putboard;
+        }
+        if (putboard)
+        {
+            alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
+        }
+        
+
+        int i = 0;
         while (legalboard)
         {
             putboard = -int64_t(legalboard) & legalboard;
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
             if (alpha_ >= beta_)
             {
+                if (alpha_ > alpha_max)
+                {
+                    alpha_max = alpha_;
+                    route_new[depth_] = i;
+                }
                 return alpha_;
             }
             legalboard ^= putboard;
+            i++;
+        }
+        if (alpha_ > alpha_max)
+        {
+            alpha_max = alpha_;
+            route_new[depth_] = i;
         }
         return alpha_;
     }
