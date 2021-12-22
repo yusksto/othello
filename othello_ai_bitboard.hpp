@@ -382,7 +382,7 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
     {
         uint64_t putboard = 0x0000000000000000;
         uint64_t tmp = legalboard;
-        for (int i = 0; i < route[depth_]; i++)
+        for (int i = 0; i < route[depth_ - 1]; i++)
         {
             putboard = -int64_t(tmp) & tmp;
             tmp ^= putboard;
@@ -390,6 +390,10 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
         if (putboard)
         {
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
+            if (alpha_ >= beta_)
+            {
+                return alpha_;
+            }
         }
         
 
