@@ -22,8 +22,7 @@ private:
 
     clock_t t_start; //探索時間計測用
     bool isTimeout; //探索打ち切り用
-    std::vector<int> route_new, route_old; //探索経路記録用
-    double alpha_max; //最大評価値記録用
+    std::vector<int> route; //探索経路記録用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
@@ -71,20 +70,10 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
 		depth++;
 		for (int i = 0; i < size; i++)
 		{
-			alpha_max = -inf;
-			route_list[i].resize(depth);
-			route_list[i][0] = 0;
-			route_old.resize(depth - 1);
-			for (int j = 0; j < depth - 1; j++)
-			{
-				route_old[j] = route_list[i][j];
-			}
-			route_new.resize(depth);
+            route = route_list[i];
 			tmp[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth - 1, -inf, inf);
-			for (int j = 0; j < depth; j++)
-			{
-				route_list[i][j] = route_new[j];
-			}
+            route.insert(route.begin(), 0);
+            route_list[i] = route;
 		}
 		if (!isTimeout)
 		{
@@ -393,7 +382,7 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
     {
         uint64_t putboard = 0x0000000000000000;
         uint64_t tmp = legalboard;
-        for (int i = 0; i < route_old[depth_]; i++)
+        for (int i = 0; i < route[depth_]; i++)
         {
             putboard = -int64_t(tmp) & tmp;
             tmp ^= putboard;
@@ -411,20 +400,11 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
             if (alpha_ >= beta_)
             {
-                if (alpha_ > alpha_max)
-                {
-                    alpha_max = alpha_;
-                    route_new[depth_] = i;
-                }
+                route[depth_ - 1] = i;
                 return alpha_;
             }
             legalboard ^= putboard;
             i++;
-        }
-        if (alpha_ > alpha_max)
-        {
-            alpha_max = alpha_;
-            route_new[depth_] = i;
         }
         return alpha_;
     }
