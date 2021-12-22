@@ -64,7 +64,7 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
 	t_start = clock();
 	isTimeout = false;
 	int depth = 0;
-	std::vector<std::vector<int>> route_list(size);
+	std::vector<std::vector<int>> route_list = std::vector<std::vector<int>>(size, std::vector<int>(1, 0));
 	while (!isTimeout)
 	{
 		depth++;
