@@ -416,7 +416,7 @@ inline float othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboa
 
 inline float othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 {
-    float n = float(get_disks(bitboard_)) / 64.; //盤面進行度 [0:1]
+    float n = float(get_disks(bitboard_)) / 64.f; //盤面進行度 [0:1]
 
     //盤面配置良さ s_1[-1:1]
     float s_1 = 0;
