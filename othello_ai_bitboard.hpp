@@ -40,7 +40,6 @@ private:
     const float inf = std::numeric_limits<float>::infinity();
     float f_1(float x); //f_1[0:1], x[0:1]
     float f_2(float x); //f_2[0:1], x[0:1]
-    float f_3(float x); //f_3[0:1], x[0:1]
 };
 
 othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<float>> parameter_, int mode_, int depth_min_, int time_max_)
