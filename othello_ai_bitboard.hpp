@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <set>
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
@@ -10,44 +11,69 @@
 class othello_ai_bitboard
 {
 public:
-    othello_ai_bitboard(std::vector<std::vector<float>> parameter_, int mode_, int depth_min_, int time_max_); //othello_ai_bitboardセット
+    othello_ai_bitboard(std::vector<std::vector<double>> parameter_, int mode_, int time_max_); //othello_ai_bitboardセット
     std::pair<int, int> get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_); //ai設置場所取得
 
 private:
     //変数
-    std::vector<std::vector<float>> parameter; //盤面評価パラメータ [-1:1]
+    std::vector<std::pair<double, uint64_t>> parameter; //盤面評価パラメータ
+    int parameter_size; //盤面評価パラメータ配列のサイズ
     int mode; //aiモード 1:最強 -1:最弱
-    int depth_min; //探索最低深度 [0:)
-    int time_max; //探索最大時間 [ms]
+    int64_t time_max; //探索最大時間 [ms]
 
-    clock_t t_start; //探索時間計測用
+    clock_t t_end; //探索時間計測用
     bool isTimeout; //探索打ち切り用
     std::vector<int> route; //探索経路記録用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
     uint64_t get_legalboard(std::pair<uint64_t, uint64_t> bitboard_); //合法手bitboard作成
+    uint64_t get_legalboard(uint64_t bitboard_0, uint64_t bitboard_1); //合法手bitboard作成
     std::vector<uint64_t> convert_legalboard_to_putboard(uint64_t legalboard_); //合法手boardからvector<指手board>へ変換
     std::pair<int, int> convert_putboard_to_pair(uint64_t putboard_); //bitboardからpairへ変換
     std::pair<uint64_t, uint64_t> get_bitboard_placed(std::pair<uint64_t, uint64_t> bitboard_, uint64_t putboard_); //設置後盤面取得
-    float alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, float alpha_, float beta_); //αβ探索
-    float evaluation(std::pair<uint64_t, uint64_t> bitboard_); //評価関数
+    double alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, double alpha_, double beta_); //αβ探索
+    double evaluation(std::pair<uint64_t, uint64_t> bitboard_); //評価関数
 
     int get_disks(std::pair<uint64_t, uint64_t> bitboard_); //石の数取得
     int get_disks(uint64_t bitboard_); //石の数取得
 
     //その他定数、活性化関数
-    const float inf = std::numeric_limits<float>::infinity();
-    float f_1(float x); //f_1[0:1], x[0:1]
-    float f_2(float x); //f_2[0:1], x[0:1]
+    const double inf = std::numeric_limits<double>::infinity();
+    double f_1(double x); //f_1[0:1], x[0:1]
+    double f_2(double x); //f_2[0:1], x[0:1]
+    double f_3(double x); //f_2[0:1], x[0:1]
 };
 
-othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<float>> parameter_, int mode_, int depth_min_, int time_max_)
+othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<double>> parameter_, int mode_, int time_max_)
 {
-    parameter = parameter_;
+    std::set<double> list;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            list.insert(parameter_[i][j]);
+        }
+    }
+    for (auto k = list.begin(); k != list.end(); k++)
+    {
+        uint64_t tmp = 0x0000000000000000;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                tmp <<= 1;
+                if (parameter_[i][j] == *k)
+                {
+                    tmp |= 0x0000000000000001;
+                }
+            }
+        }
+        parameter.push_back(std::make_pair(*k, tmp));
+    }
+    parameter_size = parameter.size();
     mode = mode_;
-    depth_min = depth_min_;
-    time_max = time_max_;
+    time_max = int64_t(time_max_);
 }
 
 std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_)
@@ -56,11 +82,11 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     uint64_t legalboard = get_legalboard(bitboard);
     std::vector<uint64_t> putboard = convert_legalboard_to_putboard(legalboard);
     const int size = get_disks(legalboard);
-    std::vector<float> val(size);
-    std::vector<float> tmp(size);
+    std::vector<double> val(size);
+    std::vector<double> tmp(size);
 
     // 反復深化深さ優先探索
-    t_start = clock();
+    t_end = std::clock() + time_max;
     isTimeout = false;
     int depth = 0;
     std::vector<std::vector<int>> route_list = std::vector<std::vector<int>>(size, std::vector<int>(1, 0));
@@ -87,12 +113,12 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
         }
     }
 
-    std::vector<std::pair<float, uint64_t>> s(size);
+    std::vector<std::pair<double, uint64_t>> s(size);
     for (int i = 0; i < size; i++)
     {
         s[i] = std::make_pair(val[i], putboard[i]);
     }
-    sort(s.begin(), s.end(), std::greater<std::pair<float, uint64_t>>());
+    sort(s.begin(), s.end(), std::greater<std::pair<double, uint64_t>>());
     return convert_putboard_to_pair(s[0].second);
 }
 
@@ -193,6 +219,89 @@ inline uint64_t othello_ai_bitboard::get_legalboard(std::pair<uint64_t, uint64_t
 
     //左斜め下
     tmp = allside & (bitboard_.first >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    tmp |= allside & (tmp >> 7);
+    legalboard |= blankboard & (tmp >> 7);
+    return legalboard;
+}
+
+inline uint64_t othello_ai_bitboard::get_legalboard(uint64_t bitboard_0, uint64_t bitboard_1)
+{
+    const uint64_t horizon = bitboard_1 & 0x7e7e7e7e7e7e7e7e;
+    const uint64_t vertical = bitboard_1 & 0x00FFFFFFFFFFFF00;
+    const uint64_t allside = bitboard_1 & 0x007e7e7e7e7e7e00;
+    const uint64_t blankboard = ~(bitboard_0 | bitboard_1);
+    uint64_t tmp = 0x0000000000000000;
+    uint64_t legalboard = 0x0000000000000000;
+
+    //左
+    tmp = horizon & (bitboard_0 << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    tmp |= horizon & (tmp << 1);
+    legalboard = blankboard & (tmp << 1);
+
+    //右
+    tmp = horizon & (bitboard_0 >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    tmp |= horizon & (tmp >> 1);
+    legalboard |= blankboard & (tmp >> 1);
+
+    //上
+    tmp = vertical & (bitboard_0 << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    tmp |= vertical & (tmp << 8);
+    legalboard |= blankboard & (tmp << 8);
+
+    //下
+    tmp = vertical & (bitboard_0 >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    tmp |= vertical & (tmp >> 8);
+    legalboard |= blankboard & (tmp >> 8);
+
+    //右斜め上
+    tmp = allside & (bitboard_0 << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    tmp |= allside & (tmp << 7);
+    legalboard |= blankboard & (tmp << 7);
+
+    //左斜め上
+    tmp = allside & (bitboard_0 << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    tmp |= allside & (tmp << 9);
+    legalboard |= blankboard & (tmp << 9);
+
+    //右斜め下
+    tmp = allside & (bitboard_0 >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    tmp |= allside & (tmp >> 9);
+    legalboard |= blankboard & (tmp >> 9);
+
+    //左斜め下
+    tmp = allside & (bitboard_0 >> 7);
     tmp |= allside & (tmp >> 7);
     tmp |= allside & (tmp >> 7);
     tmp |= allside & (tmp >> 7);
@@ -352,14 +461,14 @@ inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::get_bitboard_placed(st
     return std::make_pair(bitboard_.second, bitboard_.first);
 }
 
-inline float othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, float alpha_, float beta_)
+inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboard_, int depth_, double alpha_, double beta_)
 {
     uint64_t legalboard = get_legalboard(bitboard_);
     if (!depth_)
     {
         return evaluation(bitboard_);
     }
-    else if (std::clock() - t_start > time_max)
+    else if (std::clock() > t_end)
     {
         isTimeout = true;
         return 0;
@@ -413,34 +522,22 @@ inline float othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitboa
     }
 }
 
-inline float othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
+inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 {
-    float n = float(get_disks(bitboard_)) / 64.f; //盤面進行度 [0:1]
+    double n = double(get_disks(bitboard_)) / 64.; //盤面進行度 [0:1]
 
     //盤面配置良さ s_1[-1:1]
-    float s_1 = 0;
-    uint64_t tmp = 0x8000000000000000;
-    for (int i = 0; i < 8; i++)
+    double s_1 = 0;
+    for (const auto e : parameter)
     {
-        for (int j = 0; j < 8; j++)
-        {
-            if (bitboard_.first & tmp)
-            {
-                s_1 += parameter[i][j] / 64.f;
-            }
-            else if (bitboard_.second & tmp)
-            {
-                s_1 -= parameter[i][j] / 64.f;
-            }
-            tmp >>= 1;
-        }
+        s_1 += e.first * (get_disks(e.second & bitboard_.first) - get_disks(e.second & bitboard_.second));
     }
-    s_1 *= (1.f - f_1(n));
+    s_1 *= f_1(n);
 
     //石の数 s_2[-1:1]
     int disks_0 = get_disks(bitboard_.first);
     int disks_1 = get_disks(bitboard_.second);
-    float s_2;
+    double s_2;
     if (!disks_0)
     {
         s_2 = -inf;
@@ -451,16 +548,16 @@ inline float othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitbo
     }
     else
     {
-        s_2 = float(disks_0 - disks_1) / float(disks_0 + disks_1) * f_1(n);
+        s_2 = double(disks_0 - disks_1) / double(disks_0 + disks_1) * f_2(n);
     }
 
     //設置可能場所数 s_3[-1:1]
-    int disks_able_0 = get_disks(get_legalboard(bitboard_));
-    int disks_able_1 = get_disks(get_legalboard(std::make_pair(bitboard_.second, bitboard_.first)));
-    float s_3 = 0;
-    if (disks_able_0 || disks_able_1)
+    int disks_able_0 = get_disks(get_legalboard(bitboard_.first, bitboard_.second));
+    int disks_able_1 = get_disks(get_legalboard(bitboard_.second, bitboard_.first));
+    double s_3 = 0;
+    if (disks_able_0 | disks_able_1)
     {
-        s_3 = float(disks_able_0 - disks_able_1) / float(disks_able_0 + disks_able_1) * f_2(n);
+        s_3 = double(disks_able_0 - disks_able_1) / double(disks_able_0 + disks_able_1) * f_3(n);
     }
 
     return mode * (s_1 + s_2 + s_3);
@@ -489,29 +586,41 @@ inline int othello_ai_bitboard::get_disks(uint64_t bitboard_)
     return int(bitboard_);
 }
 
-//終盤
-inline float othello_ai_bitboard::f_1(float x)
+inline double othello_ai_bitboard::f_1(double x)
 {
-    if (x < 0.6f)
+    if (x < 0.6)
     {
-        return 0.f;
+        return 1.;
     }
-    else if (0.8f < x)
+    else if (0.8 < x)
     {
-        return 1.f;
+        return 0.;
     }
-    return 5.f * x - 3.f;
+    return -5. * x + 4.;
 }
 
-inline float othello_ai_bitboard::f_2(float x)
+inline double othello_ai_bitboard::f_2(double x)
 {
-    if (x < 0.4f)
+    if (x < 0.6)
     {
-        return 2.5f * x;
+        return 0.;
     }
-    else if (0.6f < x)
+    else if (0.8 < x)
     {
-        return -5.f * x + 4.f;
+        return 1.;
     }
-    return 1.f;
+    return 5. * x - 3.;
+}
+
+inline double othello_ai_bitboard::f_3(double x)
+{
+    if (x < 0.4)
+    {
+        return 2.5 * x;
+    }
+    else if (0.6 < x)
+    {
+        return -5. * x + 4.;
+    }
+    return 1.;
 }
