@@ -24,6 +24,7 @@ private:
     clock_t t_end; //探索時間計測用
     bool isTimeout; //探索打ち切り用
     std::vector<int> route; //探索経路記録用
+    double alpha_max; //探索評価値記録用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
@@ -90,15 +91,18 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     isTimeout = false;
     int depth = 0;
     std::vector<std::vector<int>> route_list = std::vector<std::vector<int>>(size, std::vector<int>(1, 0));
+    std::vector<double> alpha_list(size, -inf);
     while (!isTimeout)
     {
         depth++;
         for (int i = 0; i < size; i++)
         {
             route = route_list[i];
+            alpha_max = alpha_list[i];
             tmp[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth - 1, -inf, inf);
             route.insert(route.begin(), 0);
             route_list[i] = route;
+            alpha_list[i] = alpha_max;
         }
         if (!isTimeout)
         {
@@ -504,15 +508,18 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
             }
         }
 
-
         int i = 0;
         while (legalboard)
         {
             putboard = -int64_t(legalboard) & legalboard;
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
-            if (alpha_ >= beta_)
+            if (alpha_ > alpha_max)
             {
                 route[depth_] = i;
+                alpha_max = alpha_;
+            }
+            if (alpha_ >= beta_)
+            {
                 return alpha_;
             }
             legalboard ^= putboard;
