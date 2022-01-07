@@ -24,7 +24,7 @@ private:
     clock_t t_end; //探索時間計測用
     bool isTimeout; //探索打ち切り用
     std::vector<int> route; //探索経路記録用
-    double alpha_max; //探索評価値記録用
+    std::vector<double> alpha_max; //探索評価値記録用
 
     //関数
     std::pair<uint64_t, uint64_t> convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_); //vector<vector>からbitboardへ変換
@@ -77,7 +77,7 @@ othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<double>> parame
     time_max = int64_t(time_max_);
     isTimeout = false;
     route = std::vector<int>(1, 0);
-    alpha_max = -inf;
+    alpha_max = std::vector<double>(1, -inf);
 }
 
 std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_)
@@ -94,7 +94,7 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     isTimeout = false;
     int depth = 0;
     std::vector<std::vector<int>> route_list = std::vector<std::vector<int>>(size, std::vector<int>(1, 0));
-    std::vector<double> alpha_list(size, -inf);
+    std::vector<std::vector<double>> alpha_list = std::vector<std::vector<double>>(size, std::vector<double>(1, -inf));
     while (!isTimeout)
     {
         depth++;
@@ -478,7 +478,7 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
     else if (std::clock() > t_end)
     {
         isTimeout = true;
-        return 0;
+        return inf;
     }
     else if (!legalboard)
     {
@@ -502,6 +502,7 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
             putboard = -int64_t(tmp) & tmp;
             tmp ^= putboard;
         }
+        alpha_max[depth_] = -inf;
         if (putboard)
         {
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
@@ -516,10 +517,10 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
         {
             putboard = -int64_t(legalboard) & legalboard;
             alpha_ = std::max(alpha_, -alphabeta(get_bitboard_placed(bitboard_, putboard), depth_ - 1, -beta_, -alpha_));
-            if (alpha_ > alpha_max)
+            if (alpha_ > alpha_max[depth_])
             {
                 route[depth_] = i;
-                alpha_max = alpha_;
+                alpha_max[depth_] = alpha_;
             }
             if (alpha_ >= beta_)
             {
