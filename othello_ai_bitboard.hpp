@@ -75,6 +75,9 @@ othello_ai_bitboard::othello_ai_bitboard(std::vector<std::vector<double>> parame
     parameter_size = parameter.size();
     mode = mode_;
     time_max = int64_t(time_max_);
+    isTimeout = false;
+    route = std::vector<int>(1, 0);
+    alpha_max = -inf;
 }
 
 std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_)
