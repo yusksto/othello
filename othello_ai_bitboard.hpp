@@ -14,6 +14,7 @@ class othello_ai_bitboard
 public:
     othello_ai_bitboard(std::vector<std::vector<double>> parameter_, int mode_, int time_max_); //othello_ai_bitboardセット
     std::pair<int, int> get_place_ai(std::vector<std::vector<int>> vectorboard_, int disk_); //ai設置場所取得
+    void set_ai(std::vector<std::vector<double>> parameter_, int mode_, int time_max_); //othello_ai_bitboardセット
 
 private:
     //変数
@@ -128,6 +129,41 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
     }
     sort(s.begin(), s.end(), std::greater<std::pair<double, uint64_t>>());
     return convert_putboard_to_pair(s[0].second);
+}
+
+void othello_ai_bitboard::set_ai(std::vector<std::vector<double>> parameter_, int mode_, int time_max_)
+{
+    parameter.clear();
+    std::set<double> list;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            list.insert(parameter_[i][j]);
+        }
+    }
+    for (auto k = list.begin(); k != list.end(); k++)
+    {
+        uint64_t tmp = 0x0000000000000000;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                tmp <<= 1;
+                if (parameter_[i][j] == *k)
+                {
+                    tmp |= 0x0000000000000001;
+                }
+            }
+        }
+        parameter.push_back(std::make_pair(*k, tmp));
+    }
+    parameter_size = parameter.size();
+    mode = mode_;
+    time_max = int64_t(time_max_);
+    isTimeout = false;
+    route = std::vector<int>(1, 0);
+    alpha_max = std::vector<double>(1, -inf);
 }
 
 inline std::pair<uint64_t, uint64_t> othello_ai_bitboard::convert_vectorboard_to_bitboard(std::vector<std::vector<int>> vectorboard_, int disk_)
