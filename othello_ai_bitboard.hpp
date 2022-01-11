@@ -106,7 +106,7 @@ std::pair<int, int> othello_ai_bitboard::get_place_ai(std::vector<std::vector<in
             alpha_max = alpha_list[i];
             tmp[i] = -alphabeta(get_bitboard_placed(bitboard, putboard[i]), depth - 1, -inf, inf);
             route.insert(route.begin(), 0);
-            route.insert(route.begin(), -inf);
+            alpha_max.insert(alpha_max.begin(), -inf);
             route_list[i] = route;
             alpha_list[i] = alpha_max;
         }
