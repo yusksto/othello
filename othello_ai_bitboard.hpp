@@ -374,7 +374,7 @@ inline std::pair<int, int> othello_ai_bitboard::convert_putboard_to_pair(uint64_
 
 inline std::vector<uint64_t> othello_ai_bitboard::convert_legalboard_to_putboard(uint64_t legalboard_)
 {
-    std::vector<uint64_t> putboard(__popcnt64(legalboard_));
+    std::vector<uint64_t> putboard(get_disks(legalboard_));
     uint64_t tmp = 0x0000000000000000;
     int i = 0;
     while (legalboard_)
@@ -573,19 +573,19 @@ inline double othello_ai_bitboard::alphabeta(std::pair<uint64_t, uint64_t> bitbo
 
 inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitboard_)
 {
-    double n = double(__popcnt64(bitboard_.first | bitboard_.second)) / 64.; //盤面進行度 [0:1]
+    double n = double(get_disks(bitboard_.first | bitboard_.second)) / 64.; //盤面進行度 [0:1]
 
     //盤面配置良さ s_1[-1:1]
     double s_1 = 0;
     for (const auto e : parameter)
     {
-        s_1 += e.first * (__popcnt64(e.second & bitboard_.first) - __popcnt64(e.second & bitboard_.second)) / 64.;
+        s_1 += e.first * (get_disks(e.second & bitboard_.first) - get_disks(e.second & bitboard_.second)) / 64.;
     }
     s_1 *= f_1(n);
 
     //石の数 s_2[-1:1]
-    int disks_0 = __popcnt64(bitboard_.first);
-    int disks_1 = __popcnt64(bitboard_.second);
+    int disks_0 = get_disks(bitboard_.first);
+    int disks_1 = get_disks(bitboard_.second);
     double s_2;
     if (!disks_0)
     {
@@ -601,8 +601,8 @@ inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitb
     }
 
     //設置可能場所数 s_3[-1:1]
-    int disks_able_0 = __popcnt64(get_legalboard(bitboard_.first, bitboard_.second));
-    int disks_able_1 = __popcnt64(get_legalboard(bitboard_.second, bitboard_.first));
+    int disks_able_0 = get_disks(get_legalboard(bitboard_.first, bitboard_.second));
+    int disks_able_1 = get_disks(get_legalboard(bitboard_.second, bitboard_.first));
     double s_3 = 0;
     if (disks_able_0 | disks_able_1)
     {
