@@ -579,7 +579,7 @@ inline double othello_ai_bitboard::evaluation(std::pair<uint64_t, uint64_t> bitb
     double s_1 = 0;
     for (const auto e : parameter)
     {
-        s_1 += e.first * (__popcnt64(e.second & bitboard_.first) - __popcnt64(e.second & bitboard_.second));
+        s_1 += e.first * (__popcnt64(e.second & bitboard_.first) - __popcnt64(e.second & bitboard_.second)) / 64.;
     }
     s_1 *= f_1(n);
 
