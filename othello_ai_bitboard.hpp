@@ -663,13 +663,17 @@ inline double othello_ai_bitboard::f_2(double x)
 
 inline double othello_ai_bitboard::f_3(double x)
 {
-    if (x < 0.4)
+    if (x < 0.2)
     {
-        return 2.5 * x;
+        return 5. * x;
     }
-    else if (0.6 < x)
+    else if (x < 0.6)
     {
-        return -5. * x + 4.;
+        return 1.;
     }
-    return 1.;
+    else if (0.8 < x)
+    {
+        return 0.;
+    }
+    return -5. * x + 4.;
 }
